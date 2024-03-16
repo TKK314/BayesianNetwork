@@ -1,0 +1,73 @@
+# **bnlearnを使ってベイジアンネットワーク分析をやってみた**
+
+<https://qiita.com/hrkz_szk/items/a213c2c4ba823cbf78f6>
+
+<https://www.bnlearn.com/research/scirep17/>
+
+## Data
+
+```{r}
+load("prepd-ortho.rda")
+str(ortho)
+```
+
+```{r}
+diff = data.frame(
+            dANB = ortho$ANB2 - ortho$ANB,
+            dPPPM = ortho$PPPM2 - ortho$PPPM,
+            dIMPA = ortho$IMPA2 - ortho$IMPA,
+            dCoA = ortho$CoA2 - ortho$CoA,
+            dGoPg = ortho$GoPg2 - ortho$GoPg,
+            dCoGo = ortho$CoGo2 - ortho$CoGo,
+            dT = ortho$T2 - ortho$T1,
+            Growth = as.numeric(ortho$Growth) - 1,
+            Treatment = as.numeric(ortho$Treatment != "NT")
+)
+```
+
+```{r}
+library(bnlearn)
+library(Rgraphviz)
+
+```
+
+```{r}
+bl = tiers2blacklist(list("dT", "Treatment", "Growth",
+                         c("dANB", "dPPPM", "dIMPA", "dCoA", "dGoPg", "dCoGo")))
+bl = rbind(bl, c("dT", "Treatment"), c("Treatment", "dT"))
+bl
+
+```
+
+```{r}
+wl = matrix(c("dANB", "dIMPA",
+              "dPPPM", "dIMPA",
+              "dT", "Growth"),
+         ncol = 2, byrow = TRUE, dimnames = list(NULL, c("from", "to")))
+wl
+```
+
+```{r}
+dag = hc(diff, score = "bic-g", whitelist = wl, blacklist = bl)
+dag
+```
+
+```{r}
+graphviz.plot(dag, shape = "ellipse", highlight = list(arcs = wl))
+```
+
+```{r}
+str.diff = boot.strength(diff, R = 200, algorithm = "hc", 
+                         algorithm.args = list(score="bic-g", 
+                                               whitelist=wl, 
+                                               blacklist=bl))
+head(str.diff)
+```
+
+`strength`は各変数のつながりの強さで最大値が１、`direction`は方向の強さで最大値は１
+
+```{r}
+avg.diff = averaged.network(str.diff)
+strength.plot(avg.diff, str.diff, shape = "ellipse", highlight = list(arcs = wl))
+
+```
