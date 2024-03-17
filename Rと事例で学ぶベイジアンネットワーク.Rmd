@@ -253,3 +253,121 @@ arc.strength(learned, data = survey, criterion = "bic")
 ```
 
 ## 1.6離散型データでベイジアンネットワークを使ってみよう
+
+### 1.6.1DAG構造を使って
+
+```{r}
+dsep(dag, x = "S", y = "R")
+```
+
+教育水準(E)は性別(S)から影響を受けており、居住地(R)は教育水準(E)から影響を受けている（S→E、E→R）ので
+
+性別(S)と居住地(R)が関連することは明らか
+
+教育水準(E)を条件付けると性別(S)と居住地(R)の間のパスをブロックすることになるので独立になる
+
+```{r}
+dsep(dag, x = "S", y = "R", z = "E")
+```
+
+$$
+Pr(O,R|E) = Pr(O|E)Pr(R|E)
+$$
+
+### 1.6.2条件付き確率表を使って
+
+#### 1.6.2.1厳密推論
+
+```{r}
+library(gRain)
+```
+
+ベイジアンネットワークを特別丹念に構築されたツリー構造に変換する方法に依拠している
+
+ツリー構造に対して、compile関数で確率表を計算できる→setEvicence関数を用いてエビデンスをjunctionオブジェクトに入力する
+
+例）「女性が自動車や電車を利用することに対する態度」を調査したい。男女のサンプルvs女性だけのサンプルで比較したい
+
+```{r}
+#全体サンプル
+junction <- compile(as.grain(bn))
+querygrain(junction, nodes = "T")$T
+```
+
+```{r}
+#女性だけのサンプル
+jsex <- setEvidence(junction, nodes = "S", states = "F")
+querygrain(jsex, nodes = "T")$T
+```
+
+→好みは同程度であった
+
+例2）小規模の都市に居住することで利用する交通手段がどうかわるか
+
+```{r}
+jres <- setEvidence(junction, nodes = "R", states = "small")
+querygrain(jres, nodes = "T")$T
+```
+
+条件付き独立性を評価したい
+
+例3）教育水準が与えられた場合の性別と交通手段の同時確率分布
+
+```{r}
+jedu <- setEvidence(junction, nodes = "E", states = "high")
+SxT.cpt <- querygrain(jedu, nodes = c("S","T"), type = "conditional")
+SxT.cpt
+```
+
+2番目のノードで条件付けられた場合の1番目のノードの分布を算出できた
+
+交通手段(T)がどのような状態でも男性にかかる条件付き確率は同じ→教育水準Eのもとで性別Sと交通手段Tは独立
+
+#### 1.6.2.2近似推論
+
+ベイジアンネットワークを利用することで観測値をランダムに生成する方法（モンテカルロシミュレーション）
+
+計算コストは高いが、多くのノードを含む大規模なBNを扱うことが可能
+
+```{r}
+#あるエビデンスを与えた場合の特定のイベントに関する確率を算出する
+cpquery(bn, event = (S == "M") & (T == "car"), evidence = (E == "high"))
+```
+
+ただしquerygrain関数で出される正確な値とは多少異なる
+
+```{r}
+#nを増やせば多少改善はするが時間がかかる
+cpquery(bn, event = (S == "M") & (T == "car"), evidence = (E == "high"), n = 10^6)
+```
+
+```{r}
+#尤度重み付き方法を使えば真値に非常に近い確率で算出可能
+cpquery(bn, event = (S == "M") & (T == "car"), evidence = list(E = "high"), method = "lw")
+```
+
+```{r}
+#cpdist関数はエビデンスに適合するような変数のランダムな観測値を算出し、それを含んだdfを返す
+SxT <- cpdist(bn, nodes = c("S", "T"), evidence = (E == "high"))
+head(SxT)
+```
+
+## 1.7ベイジアンネットワークの図示
+
+```{r}
+graphviz.plot(dag)
+```
+
+```{r}
+hlight <- list(nodes = nodes(dag), arcs = arcs(dag), col = "grey", textCol = "grey")
+pp <- graphviz.plot(dag, highlight = hlight, render = FALSE)
+
+library(Rgraphviz)
+edgeRenderInfo(pp) <- list(col = c("S~E" ="black", "E~R" = "black"),
+                           lwd = c("S~E" = 3, "E~R" = 3))
+nodeRenderInfo(pp) <-
+  list(col = c("S" = "black", "E" = "black", "R" = "black"),
+       textCol = c("S" = "black", "E" = "black", "R" = "black"),
+       fill = c("E" = "grey"))
+renderGraph(pp)
+```
