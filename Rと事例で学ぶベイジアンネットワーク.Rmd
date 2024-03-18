@@ -371,3 +371,51 @@ nodeRenderInfo(pp) <-
        fill = c("E" = "grey"))
 renderGraph(pp)
 ```
+
+### 1.7.2条件付き確率分布の図示
+
+```{r}
+bn.fit.barchart(bn.mle$T, main = "Travel", xlab = "Pr(T|R,O)", ylab ="")
+```
+
+交通手段の周辺確率と2つの条件付き確率クエリの結果を比較する
+
+```{r}
+Evidence <- factor(c(rep("Unconditional",3), rep("Female", 3),
+                     rep("Small City",3)),
+              levels = c("Unconditional", "Female", "Small City"))
+Travel <- factor(rep(c("car", "train", "other"), 3),
+            levels = c("other", "train", "car"))
+distr <- data.frame(Evidence = Evidence, Travel = Travel,
+           Prob = c(0.5618, 0.2808, 0.15730, 0.5620, 0.2806,
+                    0.1573, 0.4838, 0.4170, 0.0990))
+distr
+```
+
+```{r}
+library(lattice)
+barchart(Travel ~ Prob | Evidence, data = distr,
+   layout = c(3, 1), xlab = "probability",
+   scales = list(alternating = 1, tck = c(1, 0)),
+   strip = strip.custom(factor.levels =
+     c(expression(Pr(T)),
+       expression(Pr({T} * " | " * {S == F})),
+       expression(Pr({T} * " | " * {R == small})))),
+   panel = function(...) {
+     panel.barchart(...)
+     panel.grid(h = 0, v = -1)
+   })
+```
+
+```{r}
+graphviz.chart(bn, grid = TRUE, main = "Original BN")
+```
+
+```{r}
+graphviz.chart(as.bn.fit(jedu, including.evidence = TRUE), grid = TRUE,
+    bar.col = c(A = "black", S = "black", E = "grey", O = "black",
+                R = "black", T = "black"),
+    strip.bg = c(A = "transparent", S = "transparent", E = "grey",
+                 O = "transparent", R = "transparent", T = "transparent"),
+    main = "BN with Evidence")
+```
