@@ -1,3 +1,22 @@
+---
+title: "Rと事例で学ぶベイジアンネットワーク"
+author: "Takaki Ohara"
+output:
+  pdf_document:
+    latex_engine: xelatex 
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+# セットアップチャンク
+library(knitr)
+opts_knit$set(progress = FALSE) # 変換処理の際のプログレスバーを非表示に
+opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
+options(tinytex.verbose = TRUE)
+```
+
+<https://www.bnlearn.com/book-crc-2ed/>
+
 # 1.離散型データ事例
 
 ## 1.2グラフィカル表現
@@ -54,7 +73,7 @@ all.equal(dag,dag2)
 
 ```{r}
 #循環している場合エラーがでる
-set.arc(dag, from = "T", to = "E")
+#set.arc(dag, from = "T", to = "E")
 ```
 
 ## 1.3確率的表現

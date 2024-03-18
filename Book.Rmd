@@ -1,3 +1,12 @@
+---
+title: "bnlearnを使ってBN分析をやってみた"
+author: "Takaki Ohara"
+output:
+  html_document:
+    theme: "cerulean"
+    self_contained: true
+---
+
 # **bnlearnを使ってベイジアンネットワーク分析をやってみた**
 
 <https://qiita.com/hrkz_szk/items/a213c2c4ba823cbf78f6>
