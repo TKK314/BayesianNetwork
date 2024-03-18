@@ -354,6 +354,10 @@ head(SxT)
 
 ## 1.7ベイジアンネットワークの図示
 
+詳細は以下に記載あり
+
+<https://www.bnlearn.com/examples/graphviz-plot/>
+
 ```{r}
 graphviz.plot(dag)
 ```
@@ -407,8 +411,13 @@ barchart(Travel ~ Prob | Evidence, data = distr,
    })
 ```
 
+仕様書
+
+<https://www.bnlearn.com/documentation/man/graphviz.chart.html>
+
 ```{r}
-graphviz.chart(bn, grid = TRUE, main = "Original BN")
+library("Rgraphviz")
+graphviz.chart(bn)
 ```
 
 ```{r}
