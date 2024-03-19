@@ -658,3 +658,118 @@ wl <- matrix(c("V", "N"), ncol = 2)
 pdag3 <- iamb(cropdata200, test = "cor", whitelist = wl)
 graphviz.plot(pdag3)
 ```
+
+### 2.5.2ネットワークスコア
+
+$$
+BIC = \log\widehat{f}(E,G,V,N,W,C) - \frac{d}{2}\log n
+$$
+
+また事後確率のスコアとしてBGe(Bayesian Gaussian equivalent score)
+
+```{r}
+score(dag.bnlearn, data = cropdata20k, type = "bic-g")
+```
+
+```{r}
+score(dag.bnlearn, data = cropdata20k, type = "bge")
+```
+
+## 2.6ガウシアン・ベイジアンネットワークを使ってみよう
+
+### 2.6.1厳密推論
+
+```{r}
+print8nbn(gbn.rbmn)
+```
+
+```{r}
+print8gema(gema.rbmn)
+```
+
+別のノードの値を固定した場合の1つor複数のノードの条件付同時分布を算出可能
+
+```{r}
+#Vを80に固定した場合のCの分布
+print8mn(condi4joint(mn.rbmn, par = "C", pour = "V", x2 = 80))
+```
+
+### 2.6.2近似推論
+
+### シミュレーションを用いる
+
+-   直接的：rnb関数
+
+-   制約的：cpquery/cpdist関数
+
+```{r}
+#(V,N)から観測値4つを生成する
+nobs <- 4
+sim <- rbn(gbn.bnlearn, n = nobs)
+sim
+```
+
+```{r}
+#条件を付けて生成する
+#非常に良質な作物を生産するための種子の数や平均重量はどのようなものか
+cpdist(gbn.bnlearn, nodes = c("C", "N", "W"), evidence = (C > 80))
+```
+
+"="を使って単一値を条件づける場合はこのアプローチは不可能となる
+
+連続型分布において単一値はつねに確率がゼロであるから
+
+```{r}
+cpdist(gbn.bnlearn, nodes = c("V","G","E"), evidence = list(G = 10, E = 90), method = "lw")
+```
+
+尤度重み付け法を用いることで解決することができる
+
+```{r}
+#特定のイベントに関する確率を算出できる
+cpquery(gbn.bnlearn, event = (V > 70), evidence = list(G = 10, E = 90), method = "lw")
+```
+
+## 2.7ガウシアン・ベイジアンネットワークの図示
+
+### 2.7.1DAGの図示
+
+```{r}
+library(igraph)
+igraph.options(print.full = TRUE)
+dag0.igraph <- graph.formula(G-+V, E-+V, V-+N, V-+W, N-+C, W-+C)
+dag0.igraph
+```
+
+```{r}
+#bnから変換もできる
+dag.igraph <- as.igraph(dag.bnlearn)
+```
+
+```{r}
+#ノードを表す
+V(dag.igraph)
+```
+
+```{r}
+#エッジを表す
+E(dag.igraph)
+```
+
+```{r}
+par(mfrow = c(1, 3), mar = rep(3, 4), cex.main = 2)
+plot(dag.igraph, main = "\n1: defaults")
+ly <- matrix(c(2, 3, 1, 1, 2, 3, 1, 4, 4, 2, 3, 2), 6)
+plot(dag.igraph, layout = ly, main = "\n2: positioning")
+vcol <- c("black", "darkgrey", "darkgrey", rep(NA, 3))
+lcol <- c(rep("white", 3), rep(NA, 3))
+par(mar = rep(0, 4), lwd = 1.5)
+plot(dag.igraph, layout = ly, frame = TRUE, main = "\n3: final",
+     vertex.color = vcol, vertex.label.color = lcol,
+     vertex.label.cex = 3, vertex.size = 50,
+     edge.arrow.size = 0.8, edge.color = "black")
+```
+
+```{r}
+
+```
