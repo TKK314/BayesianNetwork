@@ -1,0 +1,93 @@
+---
+title: "3章"
+author: "Takaki Ohara"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: "cerulean"
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+# セットアップチャンク
+library(knitr)
+opts_knit$set(progress = FALSE) # 変換処理の際のプログレスバーを非表示に
+opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
+options(tinytex.verbose = TRUE)
+```
+
+# 3.混合事例：条件付きガウシアン・ベイジアンネットワーク
+
+## 3.1事例紹介：健康管理にかかるコスト
+
+-   Age:A; 離散型
+
+-   Pre-existing conditions:C; 離散型：既往歴
+
+-   Outpatient expenditure:O; 連続型：通院にかかる費用
+
+-   Inpatient expenditure:I;連続型：入院にかかる支出
+
+-   Any hospital stay:H;離散型：入院該当の有無
+
+-   Days of hospital stay:D; 連続型：入院日数
+
+-   Taxes:T;連続型：医療費にかかる税金
+
+```{r}
+dag <- model2network("[A][C|A][H|A][D|A:H][I|C:D][O|A][T|O:I]")
+graphviz.plot(dag)
+```
+
+```{r}
+#Aの条件付き確率表作成
+A.lv <- c("young", "adult", "old")
+A.prob <- array(c(0.35, 0.45, 0.20), dim = 3, dimnames = list(A = A.lv))
+A.prob
+```
+
+年齢に応じて既往症のレベルが異なるようにCを条件付ける
+
+```{r}
+C.lv <- c("none", "mild", "severe")
+C.prob <- array(c(0.88, 0.10, 0.02, 0.75, 0.20, 0.05, 0.42, 0.53, 0.05),
+                dim = c(3, 3), dimnames = list(C = C.lv, A = A.lv))
+C.prob
+```
+
+```{r}
+H.lv <- c("none", "any")
+H.prob <- array(c(0.90, 0.10, 0.75, 0.25, 0.60, 0.40),
+                dim = c(2, 3), dimnames = list(H = H.lv, A = A.lv))
+H.prob
+```
+
+```{r}
+D.coef <- list(coef = array(c(0, 0, 0, 1, 4, 7), dim = c(1, 6),
+                            dimnames = list("(Intercept)", NULL)),
+               sd = c(0, 0, 0, 0.5, 1, 1.5))
+D.coef
+```
+
+DはH(入院の有無)×A(young mild old)に対応している
+
+Hがnoneなら0
+
+-   離散型変数→連続型変数の場合
+
+    -   親ノードの離散型変数の値に応じて複数の線形回帰モデルをセットとして表現する
+
+-   連続型変数が複数の離散型変数を親ノードとして持つ場合
+
+    -   親ノードの値に対応した回帰モデルを複数含む形で構成される
+
+-   連続型変数の親ノードが連続型変数である場合
+
+    -   親ノードの連続型変数が子ノードの下位モデルに混在する形
+
+```{r}
+I.coef <- list(coef = array(c(1, 3, 1, 5.5, 1, 8) * 100 ,
+                            dim = c(2, 3), dimnames = list(c("(Intercept)", "D"), NULL)) ,
+               sd = c(30, 50, 100))
+I.coef
+```
