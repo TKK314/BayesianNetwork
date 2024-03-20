@@ -1,5 +1,5 @@
 ---
-title: "Rと事例で学ぶベイジアンネットワーク"
+title: "1章"
 author: "Takaki Ohara"
 output:
   html_document:
@@ -449,4 +449,3 @@ graphviz.chart(as.bn.fit(jedu, including.evidence = TRUE), grid = TRUE,
                  O = "transparent", R = "transparent", T = "transparent"),
     main = "BN with Evidence")
 ```
-
