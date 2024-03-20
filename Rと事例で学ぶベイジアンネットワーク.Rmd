@@ -2,9 +2,9 @@
 title: "Rと事例で学ぶベイジアンネットワーク"
 author: "Takaki Ohara"
 output:
-  pdf_document:
-    latex_engine: xelatex 
-    number_sections: true
+  html_document:
+    theme: "cerulean"
+    self_contained: true
 ---
 
 ```{r setup, include=FALSE}
@@ -720,9 +720,10 @@ cpdist(gbn.bnlearn, nodes = c("C", "N", "W"), evidence = (C > 80))
 連続型分布において単一値はつねに確率がゼロであるから
 
 ```{r}
-cpdist(gbn.bnlearn, nodes = c("V","G","E"), evidence = list(G = 10, E = 90), method = "lw")
+head(cpdist(gbn.bnlearn, nodes = c("V","G","E"), evidence = list(G = 10, E = 90), method = "lw"), n = 5)
 ```
 
+\
 尤度重み付け法を用いることで解決することができる
 
 ```{r}
@@ -770,6 +771,64 @@ plot(dag.igraph, layout = ly, frame = TRUE, main = "\n3: final",
      edge.arrow.size = 0.8, edge.color = "black")
 ```
 
-```{r}
+### 2.7.2条件付き確率分布の図示
 
+ガウシアン・ベイジアンネットワークの局所的分布を図示するための関数はない
+
+線形回帰モデルのための回帰診断図を利用することは可能
+
+ただし、残差と当てはめ値がbn.fitオブジェクトに格納されている必要がある
+
+```{r}
+gbn.fit <- bn.fit(dag.bnlearn, data = cropdata20k)
+#残差に関するquantile-quantileプロット
+bn.fit.qqplot(gbn.fit)
+```
+
+```{r}
+#理論上の正規密度分布と重ねた残差のヒストグラム
+bn.fit.histogram(gbn.fit)
+```
+
+```{r}
+#当てはめ値に対する残差プロット
+bn.fit.xyplot(gbn.fit)
+```
+
+<!--#  結局これ見ても何を示しているのかよくわからない...-->
+
+```{r}
+#一つのノードのみに着目した図もかける
+bn.fit.qqplot(gbn.fit$C)
+```
+
+環境的ポテンシャルEと栄養期間Vの組み合わせに対してどのように収穫量Cが変化するのかについて興味があるとする（C\|E,V)
+
+```{r}
+C.EV <- condi4joint(mn.rbmn, par = "C", pour = c("E", "V"), x2 = NULL)
+C.EV$rho
+```
+
+Vに関する情報が得られたときはEに関する回帰係数が0になる→Cを推定するに当たりEに関する情報は役に立たない
+
+```{r}
+#VがEとCと有効分離の関係にある
+dsep(gbn.bnlearn, "E","C","V")
+```
+
+EとVの両方を変化させた場合のCに関する分布を算出したい
+
+3次元プロットは難しくエラーが発生しやすいので、二次元で観測値のポイントの大きさを変えることで表現する
+
+```{r}
+set.seed(5678)
+cropdata3 <- cpdist(gbn.bnlearn, nodes = c("E", "V", "C"),
+                    evidence = TRUE, n = 1000)
+plot(cropdata3$V, cropdata3$C, type = "n", main = "C|V,E; E is the point size")
+cexlim <- c(0.1, 2.4)
+cexE <- cexlim[1] + diff(cexlim) / diff(range(cropdata3$E) *
+                                          (cropdata3$E - min(cropdata3$E)))
+points(cropdata3$V, cropdata3$C, cex = cexE*10)
+cqa <- quantile(cropdata3$C, seq(0, 1, 0.1))
+abline(h = cqa, lty = 3)
 ```
