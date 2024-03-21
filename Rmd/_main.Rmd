@@ -958,4 +958,3 @@ I.coef
 ```
 
 <!--chapter:end:3章.Rmd-->
-
