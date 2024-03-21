@@ -1,0 +1,400 @@
+---
+title: "2章"
+author: "Takaki Ohara"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: "cerulean"
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+# セットアップチャンク
+library(knitr)
+opts_knit$set(progress = FALSE) # 変換処理の際のプログレスバーを非表示に
+opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
+options(tinytex.verbose = TRUE)
+```
+
+# 2.連続型データ事例：ガウシアン・ベイジアンネットワーク
+
+## 2.1事例紹介
+
+-   遺伝的ポテンシャル：genetic potential;G
+
+-   環境的ポテンシャル：environmental potential;E
+
+-   種子の数;N
+
+-   種子の平均重量;W
+
+-   栄養器官：単一の植物に蓄えられる栄養に関する情報すべてを統合した変数;V
+
+-   目的変数：作物の収穫量;C
+
+それぞれを1つの連続型変数として扱う
+
+## 2.2グラフィカル表現
+
+```{r}
+library(bnlearn)
+dag.bnlearn <- model2network("[G][E][V|G:E][N|V][W|V][C|N:W]")
+dag.bnlearn
+```
+
+```{r}
+graphviz.plot(dag.bnlearn)
+```
+
+```{r}
+#どの変数の組み合わせが周辺的に独立しているか確認する
+crop.nodes <- nodes(dag.bnlearn)
+for(n1 in crop.nodes){
+  for(n2 in crop.nodes){
+    if(dsep(dag.bnlearn, n1, n2))
+       cat(n1, "and", n2, "are independent.\n")
+  }
+}
+```
+
+EとGのみが独立している、独立性は対称的だった
+
+```{r}
+#変数をすべての組あわせで対にして、栄養器官(V)で条件づけられた場合にどのペアが条件付き独立となるか確認できる
+for(n1 in crop.nodes[crop.nodes != "V"]){
+  for(n2 in crop.nodes[crop.nodes != "V"]){
+   if(n1<n2){
+     if(dsep(dag.bnlearn, n1, n2, "V"))
+       cat(n1, "and", n2, "are independent given V.\n")
+   } 
+  }
+}
+```
+
+Vで条件づけられるとEとGは独立ではない
+
+## 2.3確率的表現
+
+```{r}
+#各パラメータの確率分布を定義する
+E.dist <- list(coef = c("(Intercept)" = 50), sd = 10)
+G.dist <- list(coef = c("(Intercept)" = 50), sd = 10)
+V.dist <- list(coef = c("(Intercept)" = -10.35534, E = 0.70711, G = 0.5), sd = 5)
+N.dist <- list(coef = c("(Intercept)" = 45, V = 0.1), sd = 9.949874)
+W.dist <- list(coef = c("(Intercept)" = 15, V = 0.7), sd = 7.141428)
+C.dist <- list(coef = c("(Intercept)" = 0, N = 0.3, W = 0.7), sd = 6.25)
+dist.list <- list(E = E.dist, G = G.dist, V = V.dist, N = N.dist, W = W.dist, C = C.dist)
+```
+
+```{r}
+gbn.bnlearn <- custom.fit(dag.bnlearn, dist = dist.list)
+```
+
+```{r}
+#局所分布のパラメータ
+gbn.bnlearn$C
+```
+
+上記は線形ガウシアン・ベイジアンネットワークである
+
+-   すべてのノードは正規分布に基づく
+
+-   親のノードをもたないノードは周辺分布により記述
+
+-   各ノードの分散はそのノードに特有で親ノードに依存しない
+
+-   各ノードの局所的分布は切片と親ノードを含んだ線形ガウシアンモデルとして表現
+
+```{r}
+#ガウシアン・ベイジアンネットワークに特化したRパッケージ
+library(rbmn)
+#bn.fitオブジェクトを変換する
+gbn.rbmn <- bnfit2nbn(gbn.bnlearn)
+```
+
+```{r}
+#多変量正規分布のパラメータを得る
+gema.rbmn <- nbn2gema(gbn.rbmn)
+mn.rbmn <- gema2mn(gema.rbmn)
+print8mn(mn.rbmn)
+```
+
+1列目：周辺分布の期待値
+
+2列目：周辺分布の標準偏差
+
+3列目以降：相関行列
+
+## 2.4パラメータの推定：相関係数
+
+DAG構造は既知とする
+
+```{r}
+#200の観測サンプルを生成して、cropdata200に格納する
+set.seed(4567)
+cropdata200 <- rbn(gbn.bnlearn, n = 200)
+set.seed(1234)
+cropdata20k <- rbn(gbn.bnlearn, n = 20000)
+dim(cropdata200)
+round(head(cropdata200), 2)
+```
+
+```{r}
+#パラメータを推定する
+#変数が因子型でなければ自動的にガウシアン・ベイジアンネットワークと判断される
+crop.fitted <- bn.fit(dag.bnlearn, data = cropdata200)
+crop.fitted
+```
+
+```{r}
+#特定のノードについて異なるパラメータ推定法を用いることもできる
+crop.fitted$C <- lm(C ~ N + W, data = cropdata200)
+crop.fitted$C
+```
+
+一般的な回帰モデルをもちいてパラメータ推定を行う
+
+リッジ、ラッソ回帰などについては以下を参照
+
+<https://aizine.ai/ridge-lasso-elasticnet/>
+
+```{r}
+#収穫量Cについてリッジ回帰を当てはめてみる
+library(penalized)
+crop.fitted$C <- penalized(C ~ N + W, lambda1 = 0, lambda2 = 1.5, data = cropdata200)
+```
+
+推定した値を真値（avg:50, sd:10)と比較する
+
+```{r}
+crop.fitted$E
+```
+
+```{r}
+crop.fitted$C
+```
+
+NやW、SDについては真値に近似しているが、切片が0とは遠いので以下で直接修正する
+
+```{r}
+crop.fitted$C <- lm(C ~ N + W - 1, data = cropdata200)
+crop.fitted$C
+```
+
+## 2.5DAG構造の学習：検定とスコア
+
+### 2.5.1条件付き独立性検定
+
+```{r}
+cormat <- cor(cropdata200[, c("C", "W", "N")])
+cormat
+```
+
+```{r}
+#cormat（相関行列）からinvcor(偏相関行列)を計算する
+#ほかのすべての変数で条件づけられた場合のXとYにおける偏相関という意味
+library(corpcor)
+invcor <- cor2pcor(cormat)
+dimnames(invcor) <- dimnames(cormat)
+invcor
+```
+
+```{r}
+#種子の数Nで条件づけられた場合に作物の収穫量Cと種子の平均重量Wは独立か、という仮説を検証できる
+ci.test("C", "W", "N", test = "cor", data = cropdata200)
+```
+
+有意な偏相関があったことから帰無仮説を棄却し、独立でないと言える
+
+```{r}
+#200個のデータセットは大規模ではないので構造自体を学習させると以下のようになる
+pdag1 <- iamb(cropdata200, test = "cor")
+graphviz.plot(pdag1)
+```
+
+```{r}
+#20kのデータセットを用いると正しく予測できる
+pdag2 <- iamb(cropdata20k, test = "cor")
+graphviz.plot(pdag2)
+```
+
+```{r}
+#一部アークの追加、削除ができる
+wl <- matrix(c("V", "N"), ncol = 2)
+pdag3 <- iamb(cropdata200, test = "cor", whitelist = wl)
+graphviz.plot(pdag3)
+```
+
+### 2.5.2ネットワークスコア
+
+$$
+BIC = \log\widehat{f}(E,G,V,N,W,C) - \frac{d}{2}\log n
+$$
+
+また事後確率のスコアとしてBGe(Bayesian Gaussian equivalent score)
+
+```{r}
+score(dag.bnlearn, data = cropdata20k, type = "bic-g")
+```
+
+```{r}
+score(dag.bnlearn, data = cropdata20k, type = "bge")
+```
+
+## 2.6ガウシアン・ベイジアンネットワークを使ってみよう
+
+### 2.6.1厳密推論
+
+```{r}
+print8nbn(gbn.rbmn)
+```
+
+```{r}
+print8gema(gema.rbmn)
+```
+
+別のノードの値を固定した場合の1つor複数のノードの条件付同時分布を算出可能
+
+```{r}
+#Vを80に固定した場合のCの分布
+print8mn(condi4joint(mn.rbmn, par = "C", pour = "V", x2 = 80))
+```
+
+### 2.6.2近似推論
+
+### シミュレーションを用いる
+
+-   直接的：rnb関数
+
+-   制約的：cpquery/cpdist関数
+
+```{r}
+#(V,N)から観測値4つを生成する
+nobs <- 4
+sim <- rbn(gbn.bnlearn, n = nobs)
+sim
+```
+
+```{r}
+#条件を付けて生成する
+#非常に良質な作物を生産するための種子の数や平均重量はどのようなものか
+cpdist(gbn.bnlearn, nodes = c("C", "N", "W"), evidence = (C > 80))
+```
+
+"="を使って単一値を条件づける場合はこのアプローチは不可能となる
+
+連続型分布において単一値はつねに確率がゼロであるから
+
+```{r}
+head(cpdist(gbn.bnlearn, nodes = c("V","G","E"), evidence = list(G = 10, E = 90), method = "lw"), n = 5)
+```
+
+\
+尤度重み付け法を用いることで解決することができる
+
+```{r}
+#特定のイベントに関する確率を算出できる
+cpquery(gbn.bnlearn, event = (V > 70), evidence = list(G = 10, E = 90), method = "lw")
+```
+
+## 2.7ガウシアン・ベイジアンネットワークの図示
+
+### 2.7.1DAGの図示
+
+```{r}
+library(igraph)
+igraph.options(print.full = TRUE)
+dag0.igraph <- graph.formula(G-+V, E-+V, V-+N, V-+W, N-+C, W-+C)
+dag0.igraph
+```
+
+```{r}
+#bnから変換もできる
+dag.igraph <- as.igraph(dag.bnlearn)
+```
+
+```{r}
+#ノードを表す
+V(dag.igraph)
+```
+
+```{r}
+#エッジを表す
+E(dag.igraph)
+```
+
+```{r}
+par(mfrow = c(1, 3), mar = rep(3, 4), cex.main = 2)
+plot(dag.igraph, main = "\n1: defaults")
+ly <- matrix(c(2, 3, 1, 1, 2, 3, 1, 4, 4, 2, 3, 2), 6)
+plot(dag.igraph, layout = ly, main = "\n2: positioning")
+vcol <- c("black", "darkgrey", "darkgrey", rep(NA, 3))
+lcol <- c(rep("white", 3), rep(NA, 3))
+par(mar = rep(0, 4), lwd = 1.5)
+plot(dag.igraph, layout = ly, frame = TRUE, main = "\n3: final",
+     vertex.color = vcol, vertex.label.color = lcol,
+     vertex.label.cex = 3, vertex.size = 50,
+     edge.arrow.size = 0.8, edge.color = "black")
+```
+
+### 2.7.2条件付き確率分布の図示
+
+ガウシアン・ベイジアンネットワークの局所的分布を図示するための関数はない
+
+線形回帰モデルのための回帰診断図を利用することは可能
+
+ただし、残差と当てはめ値がbn.fitオブジェクトに格納されている必要がある
+
+```{r}
+gbn.fit <- bn.fit(dag.bnlearn, data = cropdata20k)
+#残差に関するquantile-quantileプロット
+bn.fit.qqplot(gbn.fit)
+```
+
+```{r}
+#理論上の正規密度分布と重ねた残差のヒストグラム
+bn.fit.histogram(gbn.fit)
+```
+
+```{r}
+#当てはめ値に対する残差プロット
+bn.fit.xyplot(gbn.fit)
+```
+
+<!--#  結局これ見ても何を示しているのかよくわからない...-->
+
+```{r}
+#一つのノードのみに着目した図もかける
+bn.fit.qqplot(gbn.fit$C)
+```
+
+環境的ポテンシャルEと栄養期間Vの組み合わせに対してどのように収穫量Cが変化するのかについて興味があるとする（C\|E,V)
+
+```{r}
+C.EV <- condi4joint(mn.rbmn, par = "C", pour = c("E", "V"), x2 = NULL)
+C.EV$rho
+```
+
+Vに関する情報が得られたときはEに関する回帰係数が0になる→Cを推定するに当たりEに関する情報は役に立たない
+
+```{r}
+#VがEとCと有効分離の関係にある
+dsep(gbn.bnlearn, "E","C","V")
+```
+
+EとVの両方を変化させた場合のCに関する分布を算出したい
+
+3次元プロットは難しくエラーが発生しやすいので、二次元で観測値のポイントの大きさを変えることで表現する
+
+```{r}
+set.seed(5678)
+cropdata3 <- cpdist(gbn.bnlearn, nodes = c("E", "V", "C"),
+                    evidence = TRUE, n = 1000)
+plot(cropdata3$V, cropdata3$C, type = "n", main = "C|V,E; E is the point size")
+cexlim <- c(0.1, 2.4)
+cexE <- cexlim[1] + diff(cexlim) / diff(range(cropdata3$E) *
+                                          (cropdata3$E - min(cropdata3$E)))
+points(cropdata3$V, cropdata3$C, cex = cexE*10)
+cqa <- quantile(cropdata3$C, seq(0, 1, 0.1))
+abline(h = cqa, lty = 3)
+```
