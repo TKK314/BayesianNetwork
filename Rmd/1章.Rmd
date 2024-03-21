@@ -162,7 +162,7 @@ bn
 ## 1.4パラメータの推定：条件付き確率表
 
 ```{r}
-survey <- read.table("survey.txt", header = TRUE, colClasses = "factor")
+survey <- read.table("../data/survey.txt", header = TRUE, colClasses = "factor")
 ```
 
 パラメータ=局所的分布における条件付き確率そのもの

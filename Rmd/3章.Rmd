@@ -130,3 +130,30 @@ healthcare$I
     離散型ノードは離散型ノードしか親にできない
 
 ## 3.3パラメータの推定：混合回帰
+
+すでにDAGは既知であるとする
+
+```{r}
+costs <- read.table("../data/healthcare.txt", header = TRUE,
+                    colClasses = c("factor", "factor", "numeric", "factor",
+                                   "numeric", "numeric", "numeric"))
+```
+
+```{r}
+#最尤推定法で局所的分布のパラメータを推定した
+fitted <- bn.fit(dag, data = costs)
+```
+
+```{r}
+#今回推定したもの
+coef(fitted$H)
+```
+
+```{r}
+#経験的頻度を用いて推定したもの→つまり実際の値から算出される確率
+cpt.H <- prop.table(table(costs[, c("H", "A")]), margin = 2)
+#これをfitの推定値と比較してみる
+all.equal(cpt.H, coef(fitted$H))
+```
+
+同じものが得られている
