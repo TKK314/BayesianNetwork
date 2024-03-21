@@ -1,21 +1,3 @@
----
-title: "2章"
-author: "Takaki Ohara"
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    theme: "cerulean"
-    self_contained: true
----
-
-```{r setup, include=FALSE}
-# セットアップチャンク
-library(knitr)
-opts_knit$set(progress = FALSE) # 変換処理の際のプログレスバーを非表示に
-opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
-options(tinytex.verbose = TRUE)
-```
-
 # 2.連続型データ事例：ガウシアン・ベイジアンネットワーク
 
 ## 2.1事例紹介
