@@ -1,11 +1,4 @@
 name: "Rと事例で学ぶベイジアンネットワーク"
-navbar: 
-  title: "Rと事例で学ぶベイジアンネットワーク"
-  left:
-    - text: "ホーム"
-      href: index.html
-    - text: "趣味"
-      href: shumi.html
 output:
   html_document:
     theme: cosmo
