@@ -1,7 +1,7 @@
 name: "Rと事例で学ぶベイジアンネットワーク"
 output:
   html_document:
-    theme: cosmo
+    theme: paper
     highlight: textmate
     toc: true
     toc_float:

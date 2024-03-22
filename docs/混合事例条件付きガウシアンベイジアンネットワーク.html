@@ -382,12 +382,54 @@ T= 120+1.02I+1.05O+\varepsilon_T\sim N(0,10^2)
 ## H          adult       old     young
 ##   any  0.2380435 0.4239401 0.1060383
 ##   none 0.7619565 0.5760599 0.8939617</code></pre>
+<p>離散型変数</p>
 <div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb195-1" tabindex="-1"></a><span class="co">#経験的頻度を用いて推定したもの→つまり実際の値から算出される確率</span></span>
 <span id="cb195-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb195-2" tabindex="-1"></a>cpt.H <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(costs[, <span class="fu">c</span>(<span class="st">&quot;H&quot;</span>, <span class="st">&quot;A&quot;</span>)]), <span class="at">margin =</span> <span class="dv">2</span>)</span>
 <span id="cb195-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb195-3" tabindex="-1"></a><span class="co">#これをfitの推定値と比較してみる</span></span>
 <span id="cb195-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb195-4" tabindex="-1"></a><span class="fu">all.equal</span>(cpt.H, <span class="fu">coef</span>(fitted<span class="sc">$</span>H))</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <p>同じものが得られている</p>
+<p>連続型変数は以下</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb197-1" tabindex="-1"></a><span class="co">#lm関数による推定結果と同等となる</span></span>
+<span id="cb197-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb197-2" tabindex="-1"></a>params.T <span class="ot">&lt;-</span> <span class="fu">lm</span>(T<span class="sc">~</span>I<span class="sc">+</span>O, <span class="at">data =</span> costs)</span>
+<span id="cb197-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb197-3" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">coef</span>(fitted<span class="sc">$</span>T), <span class="fu">coef</span>(params.T))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb199-1" tabindex="-1"></a><span class="co">#sigmaについても同様である</span></span>
+<span id="cb199-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb199-2" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">sigma</span>(fitted<span class="sc">$</span>T), <span class="fu">sigma</span>(params.T))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<p>離散型の親ノードをもつ連続型のmodelの場合</p>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-1" tabindex="-1"></a>models.I <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">lm</span>(I<span class="sc">~</span>D, <span class="at">data =</span> costs[costs<span class="sc">$</span>C <span class="sc">==</span> <span class="st">&quot;none&quot;</span>, ]),</span>
+<span id="cb201-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-2" tabindex="-1"></a>                 <span class="fu">lm</span>(I<span class="sc">~</span>D, <span class="at">data =</span> costs[costs<span class="sc">$</span>C <span class="sc">==</span> <span class="st">&quot;mild&quot;</span>, ]),</span>
+<span id="cb201-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-3" tabindex="-1"></a>                 <span class="fu">lm</span>(I<span class="sc">~</span>D, <span class="at">data =</span> costs[costs<span class="sc">$</span>C <span class="sc">==</span> <span class="st">&quot;severe&quot;</span>, ]))</span>
+<span id="cb201-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-4" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fu">coef</span>(models.I[[<span class="dv">1</span>]]), <span class="fu">coef</span>(models.I[[<span class="dv">2</span>]]), <span class="fu">coef</span>(models.I[[<span class="dv">3</span>]])),</span>
+<span id="cb201-5"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-5" tabindex="-1"></a>  <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;(Intercept)&quot;</span>, <span class="st">&quot;D&quot;</span>), </span>
+<span id="cb201-6"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb201-6" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;none&quot;</span>, <span class="st">&quot;mild&quot;</span>, <span class="st">&quot;severe&quot;</span>)))</span></code></pre></div>
+<pre><code>##                  none     mild   severe
+## (Intercept)  99.71716 101.3403 117.8585
+## D           299.63817 549.3674 790.6647</code></pre>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb203-1" tabindex="-1"></a><span class="fu">c</span>(<span class="at">none =</span> <span class="fu">sigma</span>(models.I[[<span class="dv">1</span>]]), <span class="at">mild =</span> <span class="fu">sigma</span>(models.I[[<span class="dv">2</span>]]),</span>
+<span id="cb203-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb203-2" tabindex="-1"></a>  <span class="at">severe =</span> <span class="fu">sigma</span>(models.I[[<span class="dv">3</span>]]))</span></code></pre></div>
+<pre><code>##     none     mild   severe 
+## 30.35195 50.23097 94.22670</code></pre>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb205-1" tabindex="-1"></a><span class="co">#以下と同じになる</span></span>
+<span id="cb205-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb205-2" tabindex="-1"></a>fitted<span class="sc">$</span>I</span></code></pre></div>
+<pre><code>## 
+##   Parameters of node I (conditional Gaussian distribution)
+## 
+## Conditional density: I | C + D
+## Coefficients:
+##                      0          1          2
+## (Intercept)  101.34029   99.71716  117.85851
+## D            549.36741  299.63817  790.66468
+## Standard deviation of the residuals:
+##        0         1         2  
+## 50.23097  30.35195  94.22670  
+## Discrete parents&#39; configurations:
+##         C
+## 0    mild
+## 1    none
+## 2  severe</code></pre>
+<!--# なぜか0と1の場所が逆になっている -->
 
 </div>
 </div>

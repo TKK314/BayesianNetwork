@@ -125,6 +125,8 @@ fitted <- bn.fit(dag, data = costs)
 coef(fitted$H)
 ```
 
+離散型変数
+
 ```{r}
 #経験的頻度を用いて推定したもの→つまり実際の値から算出される確率
 cpt.H <- prop.table(table(costs[, c("H", "A")]), margin = 2)
@@ -133,3 +135,39 @@ all.equal(cpt.H, coef(fitted$H))
 ```
 
 同じものが得られている
+
+連続型変数は以下
+
+```{r}
+#lm関数による推定結果と同等となる
+params.T <- lm(T~I+O, data = costs)
+all.equal(coef(fitted$T), coef(params.T))
+```
+
+```{r}
+#sigmaについても同様である
+all.equal(sigma(fitted$T), sigma(params.T))
+```
+
+離散型の親ノードをもつ連続型のmodelの場合
+
+```{r}
+models.I <- list(lm(I~D, data = costs[costs$C == "none", ]),
+                 lm(I~D, data = costs[costs$C == "mild", ]),
+                 lm(I~D, data = costs[costs$C == "severe", ]))
+matrix(c(coef(models.I[[1]]), coef(models.I[[2]]), coef(models.I[[3]])),
+  nrow = 2, ncol = 3, dimnames = list(c("(Intercept)", "D"), 
+                                        c("none", "mild", "severe")))
+```
+
+```{r}
+c(none = sigma(models.I[[1]]), mild = sigma(models.I[[2]]),
+  severe = sigma(models.I[[3]]))
+```
+
+```{r}
+#以下と同じになる
+fitted$I
+```
+
+<!--# なぜか0と1の場所が逆になっている -->

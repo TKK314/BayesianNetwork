@@ -1,7 +1,7 @@
 ---
 site: bookdown::bookdown_site
 output:
-  bookdown::gitbook(self_contained = TRUE): default
+  bookdown::gitbook: default
 ---
 
 # 本サイトについて
