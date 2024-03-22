@@ -3,7 +3,7 @@
 ## 事例紹介：健康管理にかかるコスト
 
 | 項目名           | 型   | 略語 | 説明                                           |
-|--------------|--------|-------|--------------------------------------------|
+|--------------|--------------|--------------|-------------------------------|
 | 年齢             | 離散 | A    | young, adult, old                              |
 | 既往歴           | 離散 | C    | none, mild, severe                             |
 | 通院に係る支出   | 連続 | O    | 専門相談員のところに通院する際に係る個人の支出 |
@@ -13,7 +13,7 @@
 | 医療費に係る税金 | 連続 | T    | 医療費を支払う際にかかる税金                   |
 
 ```{r}
-
+library(bnlearn)
 dag <- model2network("[A][C|A][H|A][D|A:H][I|C:D][O|A][T|O:I]")
 graphviz.plot(dag)
 ```
@@ -156,7 +156,7 @@ models.I <- list(lm(I~D, data = costs[costs$C == "none", ]),
                  lm(I~D, data = costs[costs$C == "mild", ]),
                  lm(I~D, data = costs[costs$C == "severe", ]))
 matrix(c(coef(models.I[[1]]), coef(models.I[[2]]), coef(models.I[[3]])),
-  nrow = 2, ncol = 3, dimnames = list(c("(Intercept)", "D"), 
+  nrow = 2, ncol = 3, dimnames = list(c("(Intercept)", "D"),
                                         c("none", "mild", "severe")))
 ```
 
@@ -171,3 +171,70 @@ fitted$I
 ```
 
 <!--# なぜか0と1の場所が逆になっている -->
+
+既往歴と入院日数、更にはその相互作用を含めたlm関数で算出する結果は異なるので注意
+
+```{r}
+single.model <- lm(I ~ D * C, data = costs)
+coef(sigle.model)
+```
+
+```{r}
+sigma(single.model)
+```
+
+上記のモデルはすべてのデータセットを当てはめてかつ標準誤差は1つしかない
+
+一方でmodels.Iオブジェクトでは既往症(C)の状態ごとに1つの標準誤差が存在する
+
+single.modelでは全ての残差が等分散を想定
+
+models.Iでは部分集合ごとで等分散性を想定
+
+## DAG構造の学習：検定とスコア
+
+やはりBICを用いる
+
+```{r}
+#mixed categorical and normal variablesのときに用いるBICスコア
+learned <- hc(costs, score = "bic-cg")
+modelstring(learned)
+```
+
+```{r, figures-side, fig.show="hold", out.width="48%"}
+graphviz.plot(learned)
+graphviz.plot(dag)
+```
+
+```{r}
+#スコアを計算してみたが、Dのせいでマイナス無限大になってしまっていることがわかる
+print(score(dag, costs, type = "bic-cg"))
+print(score(dag, costs, type = "bic-cg", by.node = TRUE))
+```
+
+これがD\|A,H が特異な状態となっている
+
+-InfになっているからD→Hの矢印がうまくつながってない
+
+## 条件付きガウシアンベイジアンネットワークを使ってみよう
+
+入院日数が少なくとも1日以上(D\>=1)で、少なくとも固定費が生じた(I\>=100)場合を想定する
+
+さらに\$10\^5\$個のサンプルを得たあとに固定費である100ポンドを除き、入院にかかる支出(I)と入院日数(D)の平均値を関連する分位数とともに計算する
+
+```{r}
+part <- cpdist(healthcare, nodes = c("I", "D"),
+               evidence = (D >= 1) & (I >= 100), n = 10^5)
+per.day <- (part$I - 100) / part$D
+c(mean = mean(per.day), quantile(per.day, c(0.01, 0.99, 0.999)))
+```
+
+上記より大体想定していた400ポンドに近い値であった（ただし分散は広いが）
+
+```{r}
+#通院にかかる費用(O)
+part <- cpdist(healthcare, nodes = "O", evidence = (O >= 0), n = 10^5)
+summary(part$O)
+```
+
+更に幅が広くなっている
