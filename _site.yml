@@ -7,3 +7,5 @@ output:
     toc_float:
       collapse: false
     df_print: "kable"
+
+output_dir: "docs"

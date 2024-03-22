@@ -6,8 +6,6 @@ opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
 options(tinytex.verbose = TRUE)
 ```
 
-<https://www.bnlearn.com/book-crc-2ed/>
-
 # 1.離散型データ事例
 
 ## 1.2グラフィカル表現
