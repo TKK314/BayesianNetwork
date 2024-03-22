@@ -1,22 +1,19 @@
-# 2.連続型データ事例：ガウシアン・ベイジアンネットワーク
+# 連続型データ事例：ガウシアン・ベイジアンネットワーク
 
-## 2.1事例紹介
+## 事例紹介
 
--   遺伝的ポテンシャル：genetic potential;G
+いずれも連続型変数である
 
--   環境的ポテンシャル：environmental potential;E
+| 項目名             | 略語 | 説明                                                           |
+|-----------------|-------------|------------------------------------------|
+| 遺伝的ポテンシャル | G    |                                                                |
+| 環境的ポテンシャル | E    |                                                                |
+| 栄養器官           | V    | ある単一の植物に蓄えられる栄養に関する情報すべてを統合した変数 |
+| 種子の数           | N    | 開花時期には判明する                                           |
+| 種子の平均重量     | W    | 植物の寿命の後期にならないとわからない                         |
+| 作物の収穫量       | C    |                                                                |
 
--   種子の数;N
-
--   種子の平均重量;W
-
--   栄養器官：単一の植物に蓄えられる栄養に関する情報すべてを統合した変数;V
-
--   目的変数：作物の収穫量;C
-
-それぞれを1つの連続型変数として扱う
-
-## 2.2グラフィカル表現
+## グラフィカル表現
 
 ```{r}
 library(bnlearn)
@@ -55,7 +52,7 @@ for(n1 in crop.nodes[crop.nodes != "V"]){
 
 Vで条件づけられるとEとGは独立ではない
 
-## 2.3確率的表現
+## 確率的表現
 
 ```{r}
 #各パラメータの確率分布を定義する
@@ -107,7 +104,7 @@ print8mn(mn.rbmn)
 
 3列目以降：相関行列
 
-## 2.4パラメータの推定：相関係数
+## パラメータの推定：相関係数
 
 DAG構造は既知とする
 
@@ -143,7 +140,8 @@ crop.fitted$C
 ```{r}
 #収穫量Cについてリッジ回帰を当てはめてみる
 library(penalized)
-crop.fitted$C <- penalized(C ~ N + W, lambda1 = 0, lambda2 = 1.5, data = cropdata200)
+crop.fitted$C <- penalized(C ~ N + W, lambda1 = 0,
+                           lambda2 = 1.5, data = cropdata200)
 ```
 
 推定した値を真値（avg:50, sd:10)と比較する
@@ -163,9 +161,9 @@ crop.fitted$C <- lm(C ~ N + W - 1, data = cropdata200)
 crop.fitted$C
 ```
 
-## 2.5DAG構造の学習：検定とスコア
+## DAG構造の学習：検定とスコア
 
-### 2.5.1条件付き独立性検定
+### 条件付き独立性検定
 
 ```{r}
 cormat <- cor(cropdata200[, c("C", "W", "N")])
@@ -207,7 +205,7 @@ pdag3 <- iamb(cropdata200, test = "cor", whitelist = wl)
 graphviz.plot(pdag3)
 ```
 
-### 2.5.2ネットワークスコア
+### ネットワークスコア
 
 $$
 BIC = \log\widehat{f}(E,G,V,N,W,C) - \frac{d}{2}\log n
@@ -223,11 +221,12 @@ score(dag.bnlearn, data = cropdata20k, type = "bic-g")
 score(dag.bnlearn, data = cropdata20k, type = "bge")
 ```
 
-## 2.6ガウシアン・ベイジアンネットワークを使ってみよう
+## ガウシアン・ベイジアンネットワークを使ってみよう
 
-### 2.6.1厳密推論
+### 厳密推論
 
 ```{r}
+#まずどのようにBNが定義されているかを確認する
 print8nbn(gbn.rbmn)
 ```
 
@@ -242,9 +241,9 @@ print8gema(gema.rbmn)
 print8mn(condi4joint(mn.rbmn, par = "C", pour = "V", x2 = 80))
 ```
 
-### 2.6.2近似推論
+### 近似推論
 
-### シミュレーションを用いる
+シミュレーションを用いる
 
 -   直接的：rnb関数
 
@@ -260,30 +259,32 @@ sim
 ```{r}
 #条件を付けて生成する
 #非常に良質な作物を生産するための種子の数や平均重量はどのようなものか
-cpdist(gbn.bnlearn, nodes = c("C", "N", "W"), evidence = (C > 80))
+head(cpdist(gbn.bnlearn, nodes = c("C", "N", "W"), evidence = (C > 80)))
 ```
 
-"="を使って単一値を条件づける場合はこのアプローチは不可能となる
+-   "="を使って単一値を条件づける場合はこのアプローチは不可能となる
 
-連続型分布において単一値はつねに確率がゼロであるから
+    -   連続型分布において単一値はつねに確率がゼロであるから
+
+-   ただし以下のように尤度重み付け法を用いることで解決することができる
 
 ```{r}
-head(cpdist(gbn.bnlearn, nodes = c("V","G","E"), evidence = list(G = 10, E = 90), method = "lw"), n = 5)
+head(cpdist(gbn.bnlearn, nodes = c("V","G","E"),
+            evidence = list(G = 10, E = 90), method = "lw"), n = 5)
 ```
 
-\
-尤度重み付け法を用いることで解決することができる
-
 ```{r}
-#特定のイベントに関する確率を算出できる
-cpquery(gbn.bnlearn, event = (V > 70), evidence = list(G = 10, E = 90), method = "lw")
+#また特定のイベントに関する確率を算出できる
+cpquery(gbn.bnlearn, event = (V > 70),
+        evidence = list(G = 10, E = 90), method = "lw")
 ```
 
-## 2.7ガウシアン・ベイジアンネットワークの図示
+## ガウシアン・ベイジアンネットワークの図示
 
-### 2.7.1DAGの図示
+### DAGの図示
 
 ```{r}
+#別の方法を用いて作図してみる
 library(igraph)
 igraph.options(print.full = TRUE)
 dag0.igraph <- graph.formula(G-+V, E-+V, V-+N, V-+W, N-+C, W-+C)
@@ -319,7 +320,7 @@ plot(dag.igraph, layout = ly, frame = TRUE, main = "\n3: final",
      edge.arrow.size = 0.8, edge.color = "black")
 ```
 
-### 2.7.2条件付き確率分布の図示
+### 条件付き確率分布の図示
 
 ガウシアン・ベイジアンネットワークの局所的分布を図示するための関数はない
 
