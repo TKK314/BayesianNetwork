@@ -6,17 +6,38 @@ opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
 options(tinytex.verbose = TRUE)
 ```
 
-# 1.離散型データ事例
+# 離散型データ事例
 
-## 1.2グラフィカル表現
+## 事例紹介：交通手段に関する調査
+
+| 項目名   | 略語          | 説明                               |
+|----------|---------------|------------------------------------|
+| 年齢     | Age(A)        | young:\<30, adult:30\<60, old:60\< |
+| 性別     | Sex(S)        | male, female                       |
+| 教育水準 | Education(E)  | high:高卒, uni:大卒                |
+| 職業     | Occupation(O) | emp:従業員, self:自営業            |
+| 居住地   | Residence(R)  | small:小規模都市, big:大規模都市   |
+| 交通手段 | Travel(T)     | car, train, other                  |
+
+## グラフィカル表現
+
+-   6つの変数をノードとしてあらわす
+
+-   ノード間はアーク（矢印）で表現する
+
+-   連続したアークの関係をパスと呼ぶ
+
+-   ベイジアンネットワークは循環のない、Directed acyclic graphs, DAGである必要がある
 
 ```{r}
 library(bnlearn)
+#アーク無しのDAGを作成
 dag <- empty.graph(nodes=c("A","S","E","O","R","T"))
 dag
 ```
 
 ```{r}
+#各アークを設定する
 dag <- set.arc(dag, from="A", to="E")
 dag <- set.arc(dag, from="S", to="E")
 
@@ -29,7 +50,11 @@ dag <- set.arc(dag, from="R", to="T")
 dag
 ```
 
-関数の説明
+```{r}
+graphviz.plot(dag)
+```
+
+ノードやアークを確認することができる
 
 ```{r}
 nodes(dag)
@@ -65,9 +90,21 @@ all.equal(dag,dag2)
 #set.arc(dag, from = "T", to = "E")
 ```
 
-## 1.3確率的表現
+![](images/コメント 2024-03-22 112730.png)
 
-BNを作成するに当たり変数に同時確率分布を導入する必要あり
+## 確率的表現
+
+-   DAGに関する情報を使うことで、大域的分布（全変数の同時確率分布:多項分布）をより小さな局所的分布に分解可能
+
+-   アークは直接的な依存関係を示すので、逆にアークがない変数間は条件付き独立となる
+
+$$
+Pr(A,S,E,O,R,T)=Pr(A)Pr(S)Pr(E|A,S)Pr(O|E)Pr(R|E)Pr(T|O,R)
+$$
+
+-   上記のように分解がうまくいくときはDAGが循環していないときである
+
+BNを作成するにあたり変数に同時確率分布を導入する必要あり
 
 すべて離散型データなのでRにおいて水準(level)という非連続状態のデータセットを定義する必要あり
 
@@ -106,7 +143,8 @@ E.prob
 ```
 
 ```{r}
-T.prob <-array(c(0.48,0.42,0.10,0.56,0.36,0.08,0.58,0.24,0.18,0.70,0.21,0.09), dim = c(3,2,2), dimnames = list(T=T.lv, O=O.lv, R=R.lv))
+T.prob <-array(c(0.48,0.42,0.10,0.56,0.36,0.08,0.58,0.24,0.18,0.70,0.21,0.09),
+               dim = c(3,2,2), dimnames = list(T=T.lv, O=O.lv, R=R.lv))
 T.prob
 ```
 
@@ -118,7 +156,7 @@ dag3 <- model2network("[A][S][E|A:S][O|E][R|E][T|O:R]")
 ```
 
 ```{r}
-#cptは条件付き確率表を意味する
+#cptは条件付き確率表を意味し、custom.fitでDAGと確率表を組み合わせられる
 cpt <- list(A = A.prob, S = S.prob, E = E.prob, O = O.prob, R = R.prob, T= T.prob)
 bn <- custom.fit(dag, cpt)
 ```
@@ -148,13 +186,22 @@ coef(bn$R)
 bn
 ```
 
-## 1.4パラメータの推定：条件付き確率表
+## パラメータの推定：条件付き確率表
 
 ```{r}
 survey <- read.table("data/survey.txt", header = TRUE, colClasses = "factor")
+head(survey)
 ```
 
-パラメータ=局所的分布における条件付き確率そのもの
+離散型データの場合は、パラメータ=局所的分布における条件付き確率そのものとなる
+
+パラメータはデータセットにおける経験的頻度（実際の割合）から算出可能
+
+$$
+\widehat Pr(O=emp|E=high)=\frac{\widehat Pr(O=emp,E=high)}{\widehat Pr(E=high)}=\frac{O=empかつE=highの数}{E=highの数}
+$$
+
+古典的な頻度主義や最尤推定に関連する式ともいえる
 
 ```{r}
 #bn.fit関数を用いることでデータからパラメータ推定可能
@@ -165,26 +212,43 @@ bn.mle$O
 ```
 
 ```{r}
+#パッケージを使わずに頻度を計算してみる
+head(survey[, c("O", "E")])
+```
+
+```{r}
+#tableでカウントして集計してくれる
+table(survey[, c("O", "E")])
+```
+
+```{r}
+#prop.tableで頻度を計算できる、marginはたぶん桁数関連
+prop.table(table(survey[, c("O", "E")]), margin = 2)
+```
+
+上記結果がbn.fitで算出したものと同一であることがわかる
+
+```{r}
 #bayesにすると事後分布を用いたベイズ的方法になる
 bn.bayes <- bn.fit(dag, data = survey, method = "bayes", iss = 10)
 bn.bayes$O
 ```
 
-iss (imaginary sample size)はオプション：事前分布にどの程度重み付けするか
+-   iss (imaginary sample size)はオプション：事前分布にどの程度重み付けするか
 
-小さい値（1-15）にするのが一般的、値が大きいと事後分布が一様になり事前分布として用いられた一様分布へと近似していく
+-   小さい値（1-15）にするのが一般的、値が大きいと事後分布が一様になり事前分布として用いられた一様分布へと近似していく
 
-ベイズのほうがより1から遠い値となる→0を含むセルが減る
+-   ベイズのほうがより1から遠い値となる→0を含むセルが減る
 
-最尤推定法よりもロバストで予測力の高いベイジアンネットワークを構築可能
+-   最尤推定法よりもロバストで予測力の高いベイジアンネットワークを構築可能
 
-## 1.5DAG構造の学習：検定とスコア
+## DAG構造の学習：検定とスコア
 
 -   DAGの構造を探索していくこと自体が調査の目的の場合もある
 
 -   どのノードが分析対象のノードと直接関連があるか特定可能
 
-### 1.5.1条件付き独立性検定
+### 条件付き独立性検定
 
 個々のアークの有無に焦点を当てたもの
 
@@ -208,7 +272,7 @@ arc.strength(dag, data = survey, criterion = "x2")
 
 O→T以外のすべてのアークは支持されたものと判断可能
 
-### 1.5.2ネットワークスコア
+### ネットワークスコア
 
 ネットワーク全体としてのDAGに焦点を当てている。
 
@@ -257,12 +321,19 @@ score(learned, data = survey, type = "bic")
 ```
 
 ```{r}
+#各アークを取り除いたときどれくらいスコアに影響があるかを計算できる
+#R→Eが重要であることが分かる
 arc.strength(learned, data = survey, criterion = "bic")
 ```
 
-## 1.6離散型データでベイジアンネットワークを使ってみよう
+```{r}
+#ただし規定していたdagを用いたときと異なっており、surveyデータのみではすべての依存関係が正確に学習できていないことを示している
+arc.strength(dag, data = survey, criterion = "bic")
+```
 
-### 1.6.1DAG構造を使って
+## 離散型データでベイジアンネットワークを使ってみよう
+
+### DAG構造を使って
 
 ```{r}
 dsep(dag, x = "S", y = "R")
@@ -282,9 +353,9 @@ $$
 Pr(O,R|E) = Pr(O|E)Pr(R|E)
 $$
 
-### 1.6.2条件付き確率表を使って
+### 条件付き確率表を使って
 
-#### 1.6.2.1厳密推論
+#### 厳密推論
 
 ```{r}
 library(gRain)
@@ -331,7 +402,7 @@ SxT.cpt
 
 交通手段(T)がどのような状態でも男性にかかる条件付き確率は同じ→教育水準Eのもとで性別Sと交通手段Tは独立
 
-#### 1.6.2.2近似推論
+#### 近似推論
 
 ベイジアンネットワークを利用することで観測値をランダムに生成する方法（モンテカルロシミュレーション）
 
@@ -360,7 +431,7 @@ SxT <- cpdist(bn, nodes = c("S", "T"), evidence = (E == "high"))
 head(SxT)
 ```
 
-## 1.7ベイジアンネットワークの図示
+## ベイジアンネットワークの図示
 
 詳細は以下に記載あり
 
@@ -384,7 +455,7 @@ nodeRenderInfo(pp) <-
 renderGraph(pp)
 ```
 
-### 1.7.2条件付き確率分布の図示
+### 条件付き確率分布の図示
 
 ```{r}
 bn.fit.barchart(bn.mle$T, main = "Travel", xlab = "Pr(T|R,O)", ylab ="")
@@ -419,11 +490,11 @@ barchart(Travel ~ Prob | Evidence, data = distr,
    })
 ```
 
+オリジナルのベイジアンネットワークとエビデンスありのベイジアンネットワークを比較
+
 仕様書
 
 <https://www.bnlearn.com/documentation/man/graphviz.chart.html>
-
-このあたりはグラフ描画がうまくいかないのでパス。そこまで重要でもないし
 
 ```{r}
 library("Rgraphviz")
