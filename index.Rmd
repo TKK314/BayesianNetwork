@@ -3,3 +3,9 @@ site: bookdown::bookdown_site
 output:
   bookdown::gitbook: default
 ---
+
+# 本サイトについて
+
+[Rと事例で学ぶベイジアンネットワーク](https://www.kyoritsu-pub.co.jp/book/b10012360.html)をもとに勉強をすすめています
+
+[bnlearn - Bayesian network structure learning](https://www.bnlearn.com/book-crc-2ed/)に参考となるdataファイルやRコードが記載されています
