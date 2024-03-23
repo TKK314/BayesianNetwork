@@ -183,7 +183,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#事例紹介健康管理にかかるコスト"><i class="fa fa-check"></i><b>4.1</b> 事例紹介：健康管理にかかるコスト</a></li>
 <li class="chapter" data-level="4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#パラメータの推定混合回帰"><i class="fa fa-check"></i><b>4.2</b> パラメータの推定：混合回帰</a></li>
 <li class="chapter" data-level="4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#dag構造の学習検定とスコア-2"><i class="fa fa-check"></i><b>4.3</b> DAG構造の学習：検定とスコア</a></li>
-<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a></li>
+<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数が少なくとも1日以上d1で少なくとも固定費が生じたi100場合を想定する"><i class="fa fa-check"></i><b>4.4.1</b> 入院日数が少なくとも1日以上(D&gt;=1)で、少なくとも固定費が生じた(I&gt;=100)場合を想定する</a></li>
+<li class="chapter" data-level="4.4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数dと既往歴cについて確認する"><i class="fa fa-check"></i><b>4.4.2</b> 入院日数(D)と既往歴(C)について確認する</a></li>
+<li class="chapter" data-level="4.4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院にかかる支出iと通院にかかる支出o医療費にかかる税金tに関してシミュレーションを実施"><i class="fa fa-check"></i><b>4.4.3</b> 入院にかかる支出(I)と通院にかかる支出(O)、医療費にかかる税金(T)に関して、シミュレーションを実施</a></li>
+<li class="chapter" data-level="4.4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#では現状の税金の額で将来健康管理システムを維持できるのか"><i class="fa fa-check"></i><b>4.4.4</b> では、現状の税金の額で将来健康管理システムを維持できるのか</a></li>
+<li class="chapter" data-level="4.4.5" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#既往症の保有率が時間とともに変化するかもしれない仮説を検証"><i class="fa fa-check"></i><b>4.4.5</b> 既往症の保有率が時間とともに変化するかもしれない仮説を検証</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -208,10 +215,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.1</span> 事例紹介：健康管理にかかるコスト<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#事例紹介健康管理にかかるコスト" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table>
 <colgroup>
-<col width="19%" />
-<col width="19%" />
-<col width="19%" />
-<col width="42%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="50%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -466,8 +473,9 @@ T= 120+1.02I+1.05O+\varepsilon_T\sim N(0,10^2)
 </div>
 <div id="条件付きガウシアンベイジアンネットワークを使ってみよう" class="section level2 hasAnchor" number="4.4">
 <h2><span class="header-section-number">4.4</span> 条件付きガウシアンベイジアンネットワークを使ってみよう<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>入院日数が少なくとも1日以上(D&gt;=1)で、少なくとも固定費が生じた(I&gt;=100)場合を想定する</p>
-<p>さらに$10^5$個のサンプルを得たあとに固定費である100ポンドを除き、入院にかかる支出(I)と入院日数(D)の平均値を関連する分位数とともに計算する</p>
+<div id="入院日数が少なくとも1日以上d1で少なくとも固定費が生じたi100場合を想定する" class="section level3 hasAnchor" number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> 入院日数が少なくとも1日以上(D&gt;=1)で、少なくとも固定費が生じた(I&gt;=100)場合を想定する<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数が少なくとも1日以上d1で少なくとも固定費が生じたi100場合を想定する" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>さらに10^5個のサンプルを得たあとに固定費である100ポンドを除き、入院にかかる支出(I)と入院日数(D)の平均値を関連する分位数とともに計算する</p>
 <div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb218-1" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
 <span id="cb218-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb218-2" tabindex="-1"></a>               <span class="at">evidence =</span> (D <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">&amp;</span> (I <span class="sc">&gt;=</span> <span class="dv">100</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
 <span id="cb218-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb218-3" tabindex="-1"></a>per.day <span class="ot">&lt;-</span> (part<span class="sc">$</span>I <span class="sc">-</span> <span class="dv">100</span>) <span class="sc">/</span> part<span class="sc">$</span>D</span>
@@ -481,7 +489,107 @@ T= 120+1.02I+1.05O+\varepsilon_T\sim N(0,10^2)
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   22.83   65.78  171.63  174.66  204.70  528.37</code></pre>
 <p>更に幅が広くなっている</p>
+</div>
+<div id="入院日数dと既往歴cについて確認する" class="section level3 hasAnchor" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> 入院日数(D)と既往歴(C)について確認する<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数dと既往歴cについて確認する" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li>Dの平均は4.5-5日、Cは40歳で14%なのでyoungではもっと割合は低いし、高齢者なら60%程度は見込まれることが予想される</li>
+</ul>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb222-1" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="st">&quot;D&quot;</span>, <span class="at">evidence =</span> (H <span class="sc">==</span> <span class="st">&quot;any&quot;</span>),</span>
+<span id="cb222-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb222-2" tabindex="-1"></a>               <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
+<span id="cb222-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb222-3" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(part<span class="sc">$</span>D), <span class="fu">quantile</span>(part<span class="sc">$</span>D, <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="fl">0.99</span>)))</span></code></pre></div>
+<pre><code>##      mean        1%       99% 
+## 4.5845664 0.2605053 9.7687293</code></pre>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb224-1" tabindex="-1"></a><span class="co">#youngの人で既往歴がmildまたはsevereの人の割合</span></span>
+<span id="cb224-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb224-2" tabindex="-1"></a><span class="fu">cpquery</span>(healthcare, <span class="at">event =</span> (C <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;mild&quot;</span>, <span class="st">&quot;severe&quot;</span>)),</span>
+<span id="cb224-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb224-3" tabindex="-1"></a>        <span class="at">evidence =</span> (A <span class="sc">==</span> <span class="st">&quot;young&quot;</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## [1] 0.1192491</code></pre>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb226-1" tabindex="-1"></a><span class="co">#oldの人で既往歴がmildまたはsevereの人の割合</span></span>
+<span id="cb226-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb226-2" tabindex="-1"></a><span class="fu">cpquery</span>(healthcare, <span class="at">event =</span> (C <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;mild&quot;</span>, <span class="st">&quot;severe&quot;</span>)),</span>
+<span id="cb226-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb226-3" tabindex="-1"></a>        <span class="at">evidence =</span> (A <span class="sc">==</span> <span class="st">&quot;old&quot;</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## [1] 0.5755241</code></pre>
+<p>ちゃんと高くなっている事がわかる</p>
+</div>
+<div id="入院にかかる支出iと通院にかかる支出o医療費にかかる税金tに関してシミュレーションを実施" class="section level3 hasAnchor" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> 入院にかかる支出(I)と通院にかかる支出(O)、医療費にかかる税金(T)に関して、シミュレーションを実施<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院にかかる支出iと通院にかかる支出o医療費にかかる税金tに関してシミュレーションを実施" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>健康管理の費用を賄うことができる税金の額について評価する</p>
+<ul>
+<li><p>IもOも0以上であることは前提</p>
+<ul>
+<li>正規分布に従う確率変数としてモデル化されているので、負の値も取りうる</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb228-1" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;T&quot;</span>),</span>
+<span id="cb228-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb228-2" tabindex="-1"></a>          <span class="at">evidence =</span> (I <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (O <span class="sc">&gt;=</span> <span class="dv">0</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
+<span id="cb228-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb228-3" tabindex="-1"></a><span class="fu">summary</span>(part<span class="sc">$</span>T)</span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   148.1   313.4   415.6   855.1   626.5  9546.3</code></pre>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb230-1" tabindex="-1"></a>finances <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">mean.tax =</span> <span class="fu">mean</span>(part<span class="sc">$</span>T),</span>
+<span id="cb230-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb230-2" tabindex="-1"></a>              <span class="at">mean.expenditure =</span> <span class="fu">mean</span>(part<span class="sc">$</span>I <span class="sc">+</span> part<span class="sc">$</span>O),</span>
+<span id="cb230-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb230-3" tabindex="-1"></a>              <span class="at">surplus =</span> <span class="fu">mean</span>(part<span class="sc">$</span>T) <span class="sc">-</span> <span class="fu">mean</span>(part<span class="sc">$</span>I <span class="sc">+</span> part<span class="sc">$</span>O))</span>
+<span id="cb230-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb230-4" tabindex="-1"></a>finances</span></code></pre></div>
+<pre><code>##         mean.tax mean.expenditure          surplus 
+##         855.1486         715.6580         139.4907</code></pre>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb232-1" tabindex="-1"></a><span class="fu">print</span>(finances[<span class="st">&quot;mean.tax&quot;</span>] <span class="sc">/</span> <span class="dv">12</span>)</span></code></pre></div>
+<pre><code>## mean.tax 
+## 71.26239</code></pre>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb234-1" tabindex="-1"></a><span class="fu">print</span>(finances[<span class="st">&quot;mean.expenditure&quot;</span>] <span class="sc">/</span> <span class="dv">12</span>)</span></code></pre></div>
+<pre><code>## mean.expenditure 
+##         59.63817</code></pre>
+<p>上記より、ひと月で71.5ポンドが税金として取られて、うち60ポンドが医療費に使われ、残りは再投資or税金免除</p>
+</div>
+<div id="では現状の税金の額で将来健康管理システムを維持できるのか" class="section level3 hasAnchor" number="4.4.4">
+<h3><span class="header-section-number">4.4.4</span> では、現状の税金の額で将来健康管理システムを維持できるのか<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#では現状の税金の額で将来健康管理システムを維持できるのか" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>年齢(A)の分布を変えることでどのように医療費にかかる支出が変化するのか再度シミュレーションを実施する</p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb236-1" tabindex="-1"></a><span class="co">#youngを10%減らし、adultを5%減らし、oldを15%増やした</span></span>
+<span id="cb236-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb236-2" tabindex="-1"></a>new.A.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.30</span>, <span class="fl">0.40</span>, <span class="fl">0.30</span>), <span class="at">dim =</span> <span class="dv">3</span>,</span>
+<span id="cb236-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb236-3" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">A =</span> A.lv))</span>
+<span id="cb236-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb236-4" tabindex="-1"></a>new.A.prob</span></code></pre></div>
+<pre><code>## A
+## young adult   old 
+##   0.3   0.4   0.3</code></pre>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb238-1" tabindex="-1"></a>healthcare<span class="sc">$</span>A <span class="ot">&lt;-</span> new.A.prob</span>
+<span id="cb238-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb238-2" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;O&quot;</span>),</span>
+<span id="cb238-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb238-3" tabindex="-1"></a>          <span class="at">evidence =</span> (I <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (O <span class="sc">&gt;=</span> <span class="dv">0</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
+<span id="cb238-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb238-4" tabindex="-1"></a>finances[<span class="st">&quot;mean.tax&quot;</span>] <span class="sc">-</span> <span class="fu">mean</span>(part<span class="sc">$</span>I <span class="sc">+</span> part<span class="sc">$</span>O)</span></code></pre></div>
+<pre><code>## mean.tax 
+## 8.957969</code></pre>
+<p>もともと余剰金が140ポンドくらいあったのに、わずか10ポンドまで減少した</p>
+</div>
+<div id="既往症の保有率が時間とともに変化するかもしれない仮説を検証" class="section level3 hasAnchor" number="4.4.5">
+<h3><span class="header-section-number">4.4.5</span> 既往症の保有率が時間とともに変化するかもしれない仮説を検証<a href="混合事例条件付きガウシアンベイジアンネットワーク.html#既往症の保有率が時間とともに変化するかもしれない仮説を検証" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>重度の既往症を持つ人の割合が微増すれば予算を超えた支出になるはず</p>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb240-1" tabindex="-1"></a>new.C.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.88</span>, <span class="fl">0.10</span>, <span class="fl">0.02</span>, <span class="fl">0.70</span>, <span class="fl">0.22</span>, <span class="fl">0.08</span>, <span class="fl">0.41</span>, <span class="fl">0.51</span>, <span class="fl">0.08</span>), </span>
+<span id="cb240-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb240-2" tabindex="-1"></a>                    <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), </span>
+<span id="cb240-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb240-3" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">C =</span> C.lv, <span class="at">A =</span> A.lv))</span>
+<span id="cb240-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb240-4" tabindex="-1"></a><span class="co">#差分を取るとちょっとだけ悪化している人が増えている</span></span>
+<span id="cb240-5"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb240-5" tabindex="-1"></a>new.C.prob <span class="sc">-</span> C.prob</span></code></pre></div>
+<pre><code>##         A
+## C        young adult   old
+##   none       0 -0.05 -0.01
+##   mild       0  0.02 -0.02
+##   severe     0  0.03  0.03</code></pre>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb242-1" tabindex="-1"></a>healthcare<span class="sc">$</span>C <span class="ot">&lt;-</span> new.C.prob</span>
+<span id="cb242-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb242-2" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;O&quot;</span>),</span>
+<span id="cb242-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb242-3" tabindex="-1"></a>                <span class="at">evidence =</span> (I <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (O <span class="sc">&gt;=</span> <span class="dv">0</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
+<span id="cb242-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb242-4" tabindex="-1"></a>finances[<span class="st">&quot;mean.tax&quot;</span>] <span class="sc">-</span> <span class="fu">mean</span>(part<span class="sc">$</span>I <span class="sc">+</span> part<span class="sc">$</span>O)</span></code></pre></div>
+<pre><code>##  mean.tax 
+## -11.73503</code></pre>
+<p>そうするとマイナスになり予算が足りなくなって税金が増加するor治療計画を変更することで入院日数Dを減らすことになる</p>
+<p>Dを1日減らすことがどれくらい効果的かシミュレーションしてみる</p>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-1" tabindex="-1"></a><span class="co">#もともとsevere患者の入院日数は7日→6日に変更</span></span>
+<span id="cb244-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-2" tabindex="-1"></a>new.D.coef <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">coef =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">6</span>), <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">6</span>),</span>
+<span id="cb244-3"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-3" tabindex="-1"></a>                                <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="st">&quot;(Intercept)&quot;</span>, <span class="cn">NULL</span>)),</span>
+<span id="cb244-4"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-4" tabindex="-1"></a>                   <span class="at">sd =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>))</span>
+<span id="cb244-5"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-5" tabindex="-1"></a>healthcare<span class="sc">$</span>D <span class="ot">&lt;-</span> new.D.coef</span>
+<span id="cb244-6"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-6" tabindex="-1"></a>part <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(healthcare, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;O&quot;</span>),</span>
+<span id="cb244-7"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-7" tabindex="-1"></a>               <span class="at">evidence =</span> (I <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (O <span class="sc">&gt;=</span> <span class="dv">0</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>)</span>
+<span id="cb244-8"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb244-8" tabindex="-1"></a>finances[<span class="st">&quot;mean.tax&quot;</span>] <span class="sc">-</span> <span class="fu">mean</span>(part<span class="sc">$</span>I <span class="sc">+</span> part<span class="sc">$</span>O)</span></code></pre></div>
+<pre><code>## mean.tax 
+##  45.3292</code></pre>
+<p>1日変更するだけで余剰金が40ポンドとなることが予想される</p>
 
+</div>
 </div>
 </div>
             </section>

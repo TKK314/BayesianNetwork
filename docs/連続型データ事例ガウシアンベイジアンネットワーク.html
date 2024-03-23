@@ -183,7 +183,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#事例紹介健康管理にかかるコスト"><i class="fa fa-check"></i><b>4.1</b> 事例紹介：健康管理にかかるコスト</a></li>
 <li class="chapter" data-level="4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#パラメータの推定混合回帰"><i class="fa fa-check"></i><b>4.2</b> パラメータの推定：混合回帰</a></li>
 <li class="chapter" data-level="4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#dag構造の学習検定とスコア-2"><i class="fa fa-check"></i><b>4.3</b> DAG構造の学習：検定とスコア</a></li>
-<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a></li>
+<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数が少なくとも1日以上d1で少なくとも固定費が生じたi100場合を想定する"><i class="fa fa-check"></i><b>4.4.1</b> 入院日数が少なくとも1日以上(D&gt;=1)で、少なくとも固定費が生じた(I&gt;=100)場合を想定する</a></li>
+<li class="chapter" data-level="4.4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数dと既往歴cについて確認する"><i class="fa fa-check"></i><b>4.4.2</b> 入院日数(D)と既往歴(C)について確認する</a></li>
+<li class="chapter" data-level="4.4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院にかかる支出iと通院にかかる支出o医療費にかかる税金tに関してシミュレーションを実施"><i class="fa fa-check"></i><b>4.4.3</b> 入院にかかる支出(I)と通院にかかる支出(O)、医療費にかかる税金(T)に関して、シミュレーションを実施</a></li>
+<li class="chapter" data-level="4.4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#では現状の税金の額で将来健康管理システムを維持できるのか"><i class="fa fa-check"></i><b>4.4.4</b> では、現状の税金の額で将来健康管理システムを維持できるのか</a></li>
+<li class="chapter" data-level="4.4.5" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#既往症の保有率が時間とともに変化するかもしれない仮説を検証"><i class="fa fa-check"></i><b>4.4.5</b> 既往症の保有率が時間とともに変化するかもしれない仮説を検証</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -612,19 +619,19 @@ BIC = \log\widehat{f}(E,G,V,N,W,C) - \frac{d}{2}\log n
 <span id="cb160-3"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb160-3" tabindex="-1"></a><span class="fu">igraph.options</span>(<span class="at">print.full =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb160-4"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb160-4" tabindex="-1"></a>dag0.igraph <span class="ot">&lt;-</span> <span class="fu">graph.formula</span>(G<span class="sc">-+</span>V, E<span class="sc">-+</span>V, V<span class="sc">-+</span>N, V<span class="sc">-+</span>W, N<span class="sc">-+</span>C, W<span class="sc">-+</span>C)</span>
 <span id="cb160-5"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb160-5" tabindex="-1"></a>dag0.igraph</span></code></pre></div>
-<pre><code>## IGRAPH b0b48b4 DN-- 6 6 -- 
+<pre><code>## IGRAPH 5a01d1b DN-- 6 6 -- 
 ## + attr: name (v/c)
-## + edges from b0b48b4 (vertex names):
+## + edges from 5a01d1b (vertex names):
 ## [1] G-&gt;V V-&gt;N V-&gt;W E-&gt;V N-&gt;C W-&gt;C</code></pre>
 <div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb162-1" tabindex="-1"></a><span class="co">#bnから変換もできる</span></span>
 <span id="cb162-2"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb162-2" tabindex="-1"></a>dag.igraph <span class="ot">&lt;-</span> <span class="fu">as.igraph</span>(dag.bnlearn)</span></code></pre></div>
 <div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb163-1" tabindex="-1"></a><span class="co">#ノードを表す</span></span>
 <span id="cb163-2"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb163-2" tabindex="-1"></a><span class="fu">V</span>(dag.igraph)</span></code></pre></div>
-<pre><code>## + 6/6 vertices, named, from c230b7d:
+<pre><code>## + 6/6 vertices, named, from 7471164:
 ## [1] C E G N V W</code></pre>
 <div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb165-1" tabindex="-1"></a><span class="co">#エッジを表す</span></span>
 <span id="cb165-2"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb165-2" tabindex="-1"></a><span class="fu">E</span>(dag.igraph)</span></code></pre></div>
-<pre><code>## + 6/6 edges from c230b7d (vertex names):
+<pre><code>## + 6/6 edges from 7471164 (vertex names):
 ## [1] G-&gt;V E-&gt;V V-&gt;N V-&gt;W N-&gt;C W-&gt;C</code></pre>
 <div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb167-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="at">mar =</span> <span class="fu">rep</span>(<span class="dv">3</span>, <span class="dv">4</span>), <span class="at">cex.main =</span> <span class="dv">2</span>)</span>
 <span id="cb167-2"><a href="連続型データ事例ガウシアンベイジアンネットワーク.html#cb167-2" tabindex="-1"></a><span class="fu">plot</span>(dag.igraph, <span class="at">main =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">1: defaults&quot;</span>)</span>

@@ -183,7 +183,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#事例紹介健康管理にかかるコスト"><i class="fa fa-check"></i><b>4.1</b> 事例紹介：健康管理にかかるコスト</a></li>
 <li class="chapter" data-level="4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#パラメータの推定混合回帰"><i class="fa fa-check"></i><b>4.2</b> パラメータの推定：混合回帰</a></li>
 <li class="chapter" data-level="4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#dag構造の学習検定とスコア-2"><i class="fa fa-check"></i><b>4.3</b> DAG構造の学習：検定とスコア</a></li>
-<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a></li>
+<li class="chapter" data-level="4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#条件付きガウシアンベイジアンネットワークを使ってみよう"><i class="fa fa-check"></i><b>4.4</b> 条件付きガウシアンベイジアンネットワークを使ってみよう</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数が少なくとも1日以上d1で少なくとも固定費が生じたi100場合を想定する"><i class="fa fa-check"></i><b>4.4.1</b> 入院日数が少なくとも1日以上(D&gt;=1)で、少なくとも固定費が生じた(I&gt;=100)場合を想定する</a></li>
+<li class="chapter" data-level="4.4.2" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院日数dと既往歴cについて確認する"><i class="fa fa-check"></i><b>4.4.2</b> 入院日数(D)と既往歴(C)について確認する</a></li>
+<li class="chapter" data-level="4.4.3" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#入院にかかる支出iと通院にかかる支出o医療費にかかる税金tに関してシミュレーションを実施"><i class="fa fa-check"></i><b>4.4.3</b> 入院にかかる支出(I)と通院にかかる支出(O)、医療費にかかる税金(T)に関して、シミュレーションを実施</a></li>
+<li class="chapter" data-level="4.4.4" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#では現状の税金の額で将来健康管理システムを維持できるのか"><i class="fa fa-check"></i><b>4.4.4</b> では、現状の税金の額で将来健康管理システムを維持できるのか</a></li>
+<li class="chapter" data-level="4.4.5" data-path="混合事例条件付きガウシアンベイジアンネットワーク.html"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#既往症の保有率が時間とともに変化するかもしれない仮説を検証"><i class="fa fa-check"></i><b>4.4.5</b> 既往症の保有率が時間とともに変化するかもしれない仮説を検証</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -658,9 +665,9 @@ BIC = \log\widehat{Pr}(A,S,E,O,R,T) - \frac{d}{2}\log n
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="離散型データ事例.html#cb62-1" tabindex="-1"></a><span class="co">#例としてランダムグラフを作ってみるとさすがにスコアが悪い</span></span>
 <span id="cb62-2"><a href="離散型データ事例.html#cb62-2" tabindex="-1"></a>rnd <span class="ot">&lt;-</span> <span class="fu">random.graph</span>(<span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;O&quot;</span>,<span class="st">&quot;R&quot;</span>,<span class="st">&quot;T&quot;</span>))</span>
 <span id="cb62-3"><a href="離散型データ事例.html#cb62-3" tabindex="-1"></a><span class="fu">modelstring</span>(rnd)</span></code></pre></div>
-<pre><code>## [1] &quot;[A][S][E|S][O|A][R|S:E:O][T|S:O]&quot;</code></pre>
+<pre><code>## [1] &quot;[A][R][S|A][E|S][O|A:E][T|O]&quot;</code></pre>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="離散型データ事例.html#cb64-1" tabindex="-1"></a><span class="fu">score</span>(rnd, <span class="at">data =</span> survey, <span class="at">type =</span> <span class="st">&quot;bic&quot;</span>)</span></code></pre></div>
-<pre><code>## [1] -2033.747</code></pre>
+<pre><code>## [1] -2025.13</code></pre>
 <p>ネットワークのスコアが最大となるDAGを探索するためのアルゴリズム</p>
 <ul>
 <li><p>山登り法</p>
@@ -754,24 +761,24 @@ Pr(O,R|E) = Pr(O|E)Pr(R|E)
 <p>計算コストは高いが、多くのノードを含む大規模なBNを扱うことが可能</p>
 <div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="離散型データ事例.html#cb87-1" tabindex="-1"></a><span class="co">#あるエビデンスを与えた場合の特定のイベントに関する確率を算出する</span></span>
 <span id="cb87-2"><a href="離散型データ事例.html#cb87-2" tabindex="-1"></a><span class="fu">cpquery</span>(bn, <span class="at">event =</span> (S <span class="sc">==</span> <span class="st">&quot;M&quot;</span>) <span class="sc">&amp;</span> (T <span class="sc">==</span> <span class="st">&quot;car&quot;</span>), <span class="at">evidence =</span> (E <span class="sc">==</span> <span class="st">&quot;high&quot;</span>))</span></code></pre></div>
-<pre><code>## [1] 0.3397436</code></pre>
+<pre><code>## [1] 0.3380432</code></pre>
 <p>ただしquerygrain関数で出される正確な値とは多少異なる</p>
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="離散型データ事例.html#cb89-1" tabindex="-1"></a><span class="co">#nを増やせば多少改善はするが時間がかかる</span></span>
 <span id="cb89-2"><a href="離散型データ事例.html#cb89-2" tabindex="-1"></a><span class="fu">cpquery</span>(bn, <span class="at">event =</span> (S <span class="sc">==</span> <span class="st">&quot;M&quot;</span>) <span class="sc">&amp;</span> (T <span class="sc">==</span> <span class="st">&quot;car&quot;</span>), <span class="at">evidence =</span> (E <span class="sc">==</span> <span class="st">&quot;high&quot;</span>), <span class="at">n =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>)</span></code></pre></div>
-<pre><code>## [1] 0.3423342</code></pre>
+<pre><code>## [1] 0.3433196</code></pre>
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="離散型データ事例.html#cb91-1" tabindex="-1"></a><span class="co">#尤度重み付き方法を使えば真値に非常に近い確率で算出可能</span></span>
 <span id="cb91-2"><a href="離散型データ事例.html#cb91-2" tabindex="-1"></a><span class="fu">cpquery</span>(bn, <span class="at">event =</span> (S <span class="sc">==</span> <span class="st">&quot;M&quot;</span>) <span class="sc">&amp;</span> (T <span class="sc">==</span> <span class="st">&quot;car&quot;</span>), <span class="at">evidence =</span> <span class="fu">list</span>(<span class="at">E =</span> <span class="st">&quot;high&quot;</span>), <span class="at">method =</span> <span class="st">&quot;lw&quot;</span>)</span></code></pre></div>
-<pre><code>## [1] 0.3527989</code></pre>
+<pre><code>## [1] 0.3461311</code></pre>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="離散型データ事例.html#cb93-1" tabindex="-1"></a><span class="co">#cpdist関数はエビデンスに適合するような変数のランダムな観測値を算出し、それを含んだdfを返す</span></span>
 <span id="cb93-2"><a href="離散型データ事例.html#cb93-2" tabindex="-1"></a>SxT <span class="ot">&lt;-</span> <span class="fu">cpdist</span>(bn, <span class="at">nodes =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;T&quot;</span>), <span class="at">evidence =</span> (E <span class="sc">==</span> <span class="st">&quot;high&quot;</span>))</span>
 <span id="cb93-3"><a href="離散型データ事例.html#cb93-3" tabindex="-1"></a><span class="fu">head</span>(SxT)</span></code></pre></div>
 <pre><code>##   S     T
 ## 1 M train
-## 2 F   car
-## 3 F   car
-## 4 F   car
-## 5 M   car
-## 6 F train</code></pre>
+## 2 M   car
+## 3 F other
+## 4 M   car
+## 5 M other
+## 6 M train</code></pre>
 </div>
 </div>
 </div>
