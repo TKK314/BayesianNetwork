@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>1 本サイトについて | _main.knit</title>
+  <title>5 時系列データ：ダイナミック・ベイジアンネットワーク | _main.knit</title>
   <meta name="description" content="" />
   <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="1 本サイトについて | _main.knit" />
+  <meta property="og:title" content="5 時系列データ：ダイナミック・ベイジアンネットワーク | _main.knit" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="1 本サイトについて | _main.knit" />
+  <meta name="twitter:title" content="5 時系列データ：ダイナミック・ベイジアンネットワーク | _main.knit" />
   
   
   
@@ -28,8 +28,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="混合事例条件付きガウシアンベイジアンネットワーク.html"/>
 
-<link rel="next" href="離散型データ事例.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -221,21 +221,129 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<!--bookdown:title:end-->
-<!--bookdown:title:start-->
-<div id="本サイトについて" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> 本サイトについて<a href="index.html#本サイトについて" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><a href="https://www.kyoritsu-pub.co.jp/book/b10012360.html">Rと事例で学ぶベイジアンネットワーク</a>をもとに勉強をすすめています</p>
-<p><a href="https://www.bnlearn.com/book-crc-2ed/">bnlearn - Bayesian network structure learning</a>に参考となるdataファイルやRコードが記載されています</p>
+<div id="時系列データダイナミックベイジアンネットワーク" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">5</span> 時系列データ：ダイナミック・ベイジアンネットワーク<a href="時系列データダイナミックベイジアンネットワーク.html#時系列データダイナミックベイジアンネットワーク" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>本章以前のベイジアンネットワークをDBNに拡張する</p>
+<div id="事例紹介ドモティクスdomotics" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> 事例紹介：ドモティクス(domotics)<a href="時系列データダイナミックベイジアンネットワーク.html#事例紹介ドモティクスdomotics" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>民家で屋外の条件に応じて窓を開閉するためのマイクロコントローラのついたパッシブ換気（ただの窓の開け閉める）を設置して空気の質を保つ</p>
+<p>センサーによって10分ごとに環境状況を測定できる</p>
+<p>10分ごとの屋内の空気の質を予測し、屋内の新鮮な空気や快適な温度を保つために窓を開閉することを考える</p>
+</div>
+<div id="グラフィカル表現-2" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> グラフィカル表現<a href="時系列データダイナミックベイジアンネットワーク.html#グラフィカル表現-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>略称</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>風通しの悪さ</td>
+<td>St</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>屋内温度</td>
+<td>Tin</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>屋外温度</td>
+<td>Tout</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>窓の開閉</td>
+<td>W</td>
+<td>二値変数</td>
+</tr>
+</tbody>
+</table>
+<div id="静的dag" class="section level3 hasAnchor" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> 静的DAG<a href="時系列データダイナミックベイジアンネットワーク.html#静的dag" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-1" tabindex="-1"></a><span class="co">#時間情報を取り除いた静的DAG</span></span>
+<span id="cb246-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-2" tabindex="-1"></a>dag <span class="ot">&lt;-</span> <span class="fu">model2network</span>(<span class="st">&quot;[W][Tout][Tin|W:Tout][St|W]&quot;</span>)</span>
+<span id="cb246-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-3" tabindex="-1"></a><span class="fu">graphviz.plot</span>(dag)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
+</div>
+<div id="ナイーブdag" class="section level3 hasAnchor" number="5.2.2">
+<h3><span class="header-section-number">5.2.2</span> ナイーブDAG<a href="時系列データダイナミックベイジアンネットワーク.html#ナイーブdag" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="images/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202024-03-23%2010.44.50.png" width="176" /></p>
+<ul>
+<li><p>ある時点での値(t1)はそれに対応した10分前の値(t0)に依存する</p></li>
+<li><p>静的DAGをコピーして変数t0とt1をリンクさせる</p></li>
+<li><p>3つの仮定が含まれる</p>
+<ul>
+<li><p>ノード間における依存構造はt0とt1で同じ</p></li>
+<li><p>t1はt0に依存しているがその時点より前の変数には依存していない</p></li>
+<li><p>t0とt1はその時点での瞬間ではなく、ある期間にわたっての平均値</p></li>
+</ul></li>
+<li><p>限界</p>
+<ul>
+<li><p>t0にかかるノードの周辺分布はt1周辺分布と等しい必要はない</p></li>
+<li><p>パラメータ数が非常に多くなるため、推定時に安定しない</p></li>
+<li><p>t0のノードがt1のノードと同一でt0とt1をリンクしたモデルのほうが望ましい</p></li>
+</ul></li>
+</ul>
+</div>
+<div id="より倹約的なdag" class="section level3 hasAnchor" number="5.2.3">
+<h3><span class="header-section-number">5.2.3</span> より倹約的なDAG<a href="時系列データダイナミックベイジアンネットワーク.html#より倹約的なdag" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="images/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202024-03-23%2010.50.47.png" width="201" /></p>
+<ul>
+<li><p>t0のモデリングは無視してそれらを固定して扱う</p></li>
+<li><p>ノードW1も除外している</p>
+<ul>
+<li>t0時点の窓の開閉がt1時点のTin/Tout/Stいどのように影響するかの、t0時点のWの効果を検討することが目的であるから</li>
+</ul></li>
+</ul>
+</div>
+<div id="ロールアップグラフ" class="section level3 hasAnchor" number="5.2.4">
+<h3><span class="header-section-number">5.2.4</span> ロールアップグラフ<a href="時系列データダイナミックベイジアンネットワーク.html#ロールアップグラフ" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="images/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202024-03-23%2010.53.53.png" width="212" /></p>
+<ul>
+<li><p>t0からt1への同一ノードへ向かうアークを示す</p></li>
+<li><p>ループと循環の両方を含むのでDAGとは言えない</p></li>
+</ul>
+</div>
+</div>
+<div id="確率的表現-2" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> 確率的表現<a href="時系列データダイナミックベイジアンネットワーク.html#確率的表現-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>局所分布を扱うことができる</p>
+<p>これまでの離散型、ガウシアン、CCBNなどをダイナミック・ベイジアンネットワークに適応することが可能</p>
+<p>簡単にするため離散型ベイジアンネットワークを用いる</p>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-1" tabindex="-1"></a>T.lv <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="st">&quot;18-24&quot;</span>, <span class="st">&quot;&gt;24&quot;</span>)</span>
+<span id="cb247-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-2" tabindex="-1"></a>Tout0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.20</span>, <span class="fl">0.70</span>, <span class="fl">0.10</span>), <span class="at">dim =</span> <span class="dv">3</span>,</span>
+<span id="cb247-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-3" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">Tout0 =</span> T.lv))</span>
+<span id="cb247-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-4" tabindex="-1"></a><span class="co">#屋外の気温はそんなに変わらないので80%の確率でt0と同じ</span></span>
+<span id="cb247-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-5" tabindex="-1"></a>Tout1.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.80</span>, <span class="fl">0.19</span>, <span class="fl">0.01</span>, <span class="fl">0.10</span>, <span class="fl">0.80</span>, <span class="fl">0.10</span>, <span class="fl">0.01</span>, <span class="fl">0.19</span>, <span class="fl">0.80</span>),</span>
+<span id="cb247-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-6" tabindex="-1"></a>                    <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>),</span>
+<span id="cb247-7"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-7" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">Tout1 =</span> T.lv, <span class="at">Tout0 =</span> T.lv))</span>
+<span id="cb247-8"><a href="時系列データダイナミックベイジアンネットワーク.html#cb247-8" tabindex="-1"></a>Tout1.prob</span></code></pre></div>
+<pre><code>##        Tout0
+## Tout1    &lt;18 18-24  &gt;24
+##   &lt;18   0.80   0.1 0.01
+##   18-24 0.19   0.8 0.19
+##   &gt;24   0.01   0.1 0.80</code></pre>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-1" tabindex="-1"></a>W.lv <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;open&quot;</span>, <span class="st">&quot;closed&quot;</span>)</span>
+<span id="cb249-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-2" tabindex="-1"></a>W0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="at">dim =</span> <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">W0 =</span> W.lv))</span>
+<span id="cb249-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-3" tabindex="-1"></a>W0.prob</span></code></pre></div>
+<pre><code>## W0
+##   open closed 
+##    0.5    0.5</code></pre>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
+<a href="混合事例条件付きガウシアンベイジアンネットワーク.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="離散型データ事例.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
