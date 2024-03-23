@@ -3,7 +3,7 @@
 ## 事例紹介：健康管理にかかるコスト
 
 | 項目名           | 型   | 略語 | 説明                                           |
-|--------------|--------------|--------------|-------------------------------|
+|------------|------------|------------|-------------------------------------|
 | 年齢             | 離散 | A    | young, adult, old                              |
 | 既往歴           | 離散 | C    | none, mild, severe                             |
 | 通院に係る支出   | 連続 | O    | 専門相談員のところに通院する際に係る個人の支出 |
@@ -218,9 +218,9 @@ print(score(dag, costs, type = "bic-cg", by.node = TRUE))
 
 ## 条件付きガウシアンベイジアンネットワークを使ってみよう
 
-入院日数が少なくとも1日以上(D\>=1)で、少なくとも固定費が生じた(I\>=100)場合を想定する
+#### 入院日数が少なくとも1日以上(D\>=1)で、少なくとも固定費が生じた(I\>=100)場合を想定する
 
-さらに\$10\^5\$個のサンプルを得たあとに固定費である100ポンドを除き、入院にかかる支出(I)と入院日数(D)の平均値を関連する分位数とともに計算する
+さらに10\^5個のサンプルを得たあとに固定費である100ポンドを除き、入院にかかる支出(I)と入院日数(D)の平均値を関連する分位数とともに計算する
 
 ```{r}
 part <- cpdist(healthcare, nodes = c("I", "D"),
@@ -238,3 +238,111 @@ summary(part$O)
 ```
 
 更に幅が広くなっている
+
+#### 入院日数(D)と既往歴(C)について確認する
+
+-   Dの平均は4.5-5日、Cは40歳で14%なのでyoungではもっと割合は低いし、高齢者なら60%程度は見込まれることが予想される
+
+```{r}
+part <- cpdist(healthcare, nodes = "D", evidence = (H == "any"),
+               n = 10^5)
+c(mean = mean(part$D), quantile(part$D, c(0.01, 0.99)))
+```
+
+```{r}
+#youngの人で既往歴がmildまたはsevereの人の割合
+cpquery(healthcare, event = (C %in% c("mild", "severe")),
+        evidence = (A == "young"), n = 10^5)
+```
+
+```{r}
+#oldの人で既往歴がmildまたはsevereの人の割合
+cpquery(healthcare, event = (C %in% c("mild", "severe")),
+        evidence = (A == "old"), n = 10^5)
+```
+
+ちゃんと高くなっている事がわかる
+
+#### 入院にかかる支出(I)と通院にかかる支出(O)、医療費にかかる税金(T)に関して、シミュレーションを実施
+
+健康管理の費用を賄うことができる税金の額について評価する
+
+-   IもOも0以上であることは前提
+
+    -   正規分布に従う確率変数としてモデル化されているので、負の値も取りうる
+
+```{r}
+part <- cpdist(healthcare, nodes = c("I", "O", "T"),
+          evidence = (I >= 0) & (O >= 0), n = 10^5)
+summary(part$T)
+```
+
+```{r}
+finances <- c(mean.tax = mean(part$T),
+              mean.expenditure = mean(part$I + part$O),
+              surplus = mean(part$T) - mean(part$I + part$O))
+finances
+```
+
+```{r}
+print(finances["mean.tax"] / 12)
+print(finances["mean.expenditure"] / 12)
+```
+
+上記より、ひと月で71.5ポンドが税金として取られて、うち60ポンドが医療費に使われ、残りは再投資or税金免除
+
+#### では、現状の税金の額で将来健康管理システムを維持できるのか
+
+年齢(A)の分布を変えることでどのように医療費にかかる支出が変化するのか再度シミュレーションを実施する
+
+```{r}
+#youngを10%減らし、adultを5%減らし、oldを15%増やした
+new.A.prob <- array(c(0.30, 0.40, 0.30), dim = 3,
+                    dimnames = list(A = A.lv))
+new.A.prob
+```
+
+```{r}
+healthcare$A <- new.A.prob
+part <- cpdist(healthcare, nodes = c("I", "O"),
+          evidence = (I >= 0) & (O >= 0), n = 10^5)
+finances["mean.tax"] - mean(part$I + part$O)
+```
+
+もともと余剰金が140ポンドくらいあったのに、わずか10ポンドまで減少した
+
+#### 既往症の保有率が時間とともに変化するかもしれない仮説を検証
+
+重度の既往症を持つ人の割合が微増すれば予算を超えた支出になるはず
+
+```{r}
+new.C.prob <- array(c(0.88, 0.10, 0.02, 0.70, 0.22, 0.08, 0.41, 0.51, 0.08), 
+                    dim = c(3, 3), 
+                    dimnames = list(C = C.lv, A = A.lv))
+#差分を取るとちょっとだけ悪化している人が増えている
+new.C.prob - C.prob
+```
+
+```{r}
+healthcare$C <- new.C.prob
+part <- cpdist(healthcare, nodes = c("I", "O"),
+                evidence = (I >= 0) & (O >= 0), n = 10^5)
+finances["mean.tax"] - mean(part$I + part$O)
+```
+
+そうするとマイナスになり予算が足りなくなって税金が増加するor治療計画を変更することで入院日数Dを減らすことになる
+
+Dを1日減らすことがどれくらい効果的かシミュレーションしてみる
+
+```{r}
+#もともとsevere患者の入院日数は7日→6日に変更
+new.D.coef <- list(coef = array(c(0, 0, 0, 1, 4, 6), dim = c(1, 6),
+                                dimnames = list("(Intercept)", NULL)),
+                   sd = c(0, 0, 0, 0.5, 1, 1.5))
+healthcare$D <- new.D.coef
+part <- cpdist(healthcare, nodes = c("I", "O"),
+               evidence = (I >= 0) & (O >= 0), n = 10^5)
+finances["mean.tax"] - mean(part$I + part$O)
+```
+
+1日変更するだけで余剰金が40ポンドとなることが予想される
