@@ -176,7 +176,7 @@ fitted$I
 
 ```{r}
 single.model <- lm(I ~ D * C, data = costs)
-coef(sigle.model)
+coef(single.model)
 ```
 
 ```{r}

@@ -22,6 +22,7 @@
 ### 静的DAG
 
 ```{r}
+library(bnlearn)
 #時間情報を取り除いた静的DAG
 dag <- model2network("[W][Tout][Tin|W:Tout][St|W]")
 graphviz.plot(dag)
@@ -29,7 +30,7 @@ graphviz.plot(dag)
 
 ### ナイーブDAG
 
-![](images/スクリーンショット 2024-03-23 10.44.50.png){width="176"}
+![](images/スクリーンショット%202024-03-23%2010.44.50.png){width="176"}
 
 -   ある時点での値(t1)はそれに対応した10分前の値(t0)に依存する
 
@@ -53,7 +54,7 @@ graphviz.plot(dag)
 
 ### より倹約的なDAG
 
-![](images/スクリーンショット 2024-03-23 10.50.47.png){width="201"}
+![](images/スクリーンショット%202024-03-23%2010.50.47.png){width="201"}
 
 -   t0のモデリングは無視してそれらを固定して扱う
 
@@ -61,9 +62,11 @@ graphviz.plot(dag)
 
     -   t0時点の窓の開閉がt1時点のTin/Tout/Stいどのように影響するかの、t0時点のWの効果を検討することが目的であるから
 
+-   今回はこれを採用する
+
 ### ロールアップグラフ
 
-![](images/スクリーンショット 2024-03-23 10.53.53.png){width="212"}
+![](images/スクリーンショット%202024-03-23%2010.53.53.png){width="212"}
 
 -   t0からt1への同一ノードへ向かうアークを示す
 
@@ -89,7 +92,208 @@ Tout1.prob
 ```
 
 ```{r}
+#窓の開閉に関しては確率は0.5と言える
 W.lv <- c("open", "closed")
 W0.prob <- array(c(0.5, 0.5), dim = 2, dimnames = list(W0 = W.lv))
 W0.prob
 ```
+
+```{r}
+#風通しの悪さはlow(風通しが良い)とhigh(悪い)のみとしSt0に一様分布を適用することとした
+St.lv <- c("low", "high")
+#最初は確率は半分ずつ
+St0.prob <- array(c(0.50, 0.50), dim = 2, dimnames = list(St0 = St.lv))
+#窓が開いているときは風通しが良い(low)６６６６６６６６６６確率が高くなるように設定
+St1.prob <- array(c(0.90, 0.10, 0.70, 0.30, 0.70, 
+                    0.30, 0.10, 0.90), dim = c(2, 2, 2),
+                  dimnames = list(St1 = St.lv, St0 = St.lv, W0 = W.lv))
+St1.prob
+```
+
+```{r}
+#快適な温度である確率が高くなるように設定
+Tin0.prob <- array(c(0.10, 0.85, 0.05), dim = 3,
+               dimnames = list(Tin0 = T.lv))
+#Tin0と同程度の温度となる確率が高くなるように設定
+#Toutが高い、低いという値に依存して変化するように設定
+#窓の開閉でTin1が変動する確率を変化
+#<18から>24へ突然いかないようにした
+Tin1.prob <- array(c(
+          # W0 = "open", Tin0 = "<18"
+          0.875, 0.125, 0, 0.075, 0.9, 0.025, 0.075, 0.7, 0.225,
+          # W0 = "closed", Tin0 = "<18"
+          0.875, 0.125, 0, 0.475, 0.5, 0.025, 0.025, 0.65, 0.325,
+          # W0 = "open", Tin0 = "18-24"
+          0.475, 0.525, 0, 0.075, 0.8, 0.125, 0, 0.875, 0.125,
+          # W0 = "closed", Tin0 = "18-24"
+          0.075, 0.9, 0.025, 0, 0.875, 0.125, 0, 0.475, 0.525,
+          # W0 = "open", Tin0 = ">24"
+          0.15, 0.725, 0.125, 0, 0.475, 0.525, 0, 0.475, 0.525,
+          # W0 = "closed", Tin0 = ">24"
+          0, 0.125, 0.875, 0, 0.075, 0.925, 0, 0.175, 0.825),
+    dim = c(3, 3, 2, 3),
+    dimnames = list(Tin1 = T.lv, Tout1 = T.lv, W0 = W.lv, Tin0 = T.lv))
+Tin1.prob
+```
+
+ダイナミック・ベイジアンネットワークを作成する
+
+```{r}
+dag <- model2network(paste0("[W0][St0][Tout0][Tin0][St1|St0:W0]",
+             "[Tout1|Tout0][Tin1|Tin0:W0:Tout1]"))
+graphviz.plot(dag)
+```
+
+```{r}
+#確率表を組み合わせる
+cpt <- list(Tout0 = Tout0.prob, Tout1 = Tout1.prob, W0 = W0.prob,
+         Tin0 = Tin0.prob, Tin1 = Tin1.prob, St0 = St0.prob,
+         St1 = St1.prob)
+dbn <- custom.fit(dag, cpt)
+```
+
+```{r}
+nparams(dbn)
+```
+
+このようにDBNでは必要となるパラメータが容易に増えてしまう
+
+簡素化を図ったがそれでも多い。
+
+## DBNの学習
+
+```{r}
+#作ったDBNをもとに2000個のサンプルを生成しておく
+domotics <- rbn(dbn, 2000)
+write.table(domotics, file = "data/domotics.txt")
+```
+
+-   DBNに特有の統計手法は特に必要ない
+
+-   一部異なるところがあるので以下で説明する
+
+```{r}
+#t0とt1で別々に学習する必要がある
+t0.nodes <- c("W0", "St0", "Tout0", "Tin0")
+t1.nodes <- c("St1", "Tout1", "Tin1")
+```
+
+t0でのノードは単独で存在しており、アークはないためブラックリストに入れる
+
+```{r}
+bl <- set2blacklist(t0.nodes)
+```
+
+t1からt0へ向かうすべてのアークに対してブラックリストに入れる
+
+```{r}
+bl <- rbind(bl, tiers2blacklist(list(t0.nodes, t1.nodes)))
+bl
+```
+
+```{r}
+#2000個の観測値から予測してみる
+dbn.hc <- hc(domotics, blacklist = bl)
+all.equal(dag, dbn.hc)
+graphviz.plot(dbn.hc)
+```
+
+```{r}
+#パラメータ推定しておく
+dbn.fit <- bn.fit(dbn.hc, domotics)
+```
+
+## DBNを使ってみよう
+
+予測のために用いる点に注意
+
+### 屋内適温、屋外寒冷、風通しは良くないとき、風通しがよく適温にするために窓を開けるべきか？
+
+```{r}
+#窓を閉めたままパターン
+print(paste("close:",
+            cpquery(dbn.fit, event = (St1 == "low") & (Tin1 == "18-24"),
+                    evidence = (St0 == "high") & (Tin0 == "18-24") &
+                      (Tout0 == "<18") & (W0 == "closed"))
+            )
+      )
+#窓を開けたパターン
+print(paste("open:", 
+            cpquery(dbn.fit, event = (St1 == "low") & (Tin1 == "18-24"),
+                    evidence = (St0 == "high") & (Tin0 == "18-24") &
+                      (Tout0 == "<18") & (W0 == "open"))
+            )
+      )
+```
+
+以上より窓を開けることでより達成に近づくがその確率は0.5を下回っており低い
+
+### t0で屋外の状態が不明なとき、窓を開けるべきか
+
+```{r}
+cpquery(dbn.fit, event = (St1 == "low") & (Tin1 == "18-24"),
+        evidence = (St0 == "high") & (Tin0 == "18-24") & (W0 == "closed"))
+cpquery(dbn.fit, event = (St1 == "low") & (Tin1 == "18-24"),
+  evidence = (St0 == "high") & (Tin0 == "18-24") & (W0 == "open"))
+```
+
+この結果はTout0における平均的な状態で条件づけた場合の確率を示す
+
+### このプロセスを自動化する
+
+```{r}
+evidence <- data.frame(St0 = factor("high", levels = St.lv),
+              Tin0 = factor("18-24", levels = T.lv),
+              Tout0 = factor("<18", levels = T.lv),
+              W0 = factor("open", levels = W.lv))
+```
+
+t0において観察される状態を生成しておく
+
+```{r}
+#まずTin1を予測する
+predict(dbn.fit, data = evidence, node = "Tin1", method = "bayes-lw")
+```
+
+```{r}
+#Tin1をもとに続いてSt1の状態を予測する
+evidence$Tin1 <- factor("18-24", levels = T.lv)
+predict(dbn.fit, data = evidence, node = "St1", method = "bayes-lw")
+```
+
+lowとなったことから、openにすることで適温かつ風通しが良い状態になることが予測される
+
+```{r}
+#逆にclosedにするとhighとなり風通しが悪くなることが予想される
+evidence <- data.frame(St0 = factor("high", levels = St.lv),
+              Tin0 = factor("18-24", levels = T.lv),
+              Tout0 = factor("<18", levels = T.lv),
+              W0 = factor("closed", levels = W.lv))
+predict(dbn.fit, data = evidence, node = "Tin1", method = "bayes-lw")
+evidence$Tin1 <- factor("18-24", levels = T.lv)
+predict(dbn.fit, data = evidence, node = "St1", method = "bayes-lw")
+```
+
+## DBNの図示
+
+-   DAGは左から右に流れるように表示する
+
+```{r}
+library(Rgraphviz)
+#一旦グラフオブジェクトを作成する
+gR <- graphviz.plot(dag)
+```
+
+```{r}
+#t0とt1でグルーピングする
+t0.nodes <- c("W0", "St0", "Tout0", "Tin0")
+t1.nodes <- c("St1", "Tout1", "Tin1")
+#sg0 <- list(graph = subGraph(t0.nodes, gR), cluster = TRUE)
+#sg1 <- list(graph = subGraph(t1.nodes, gR), cluster = TRUE)
+```
+
+ここで各ノードをグループ化していい感じに表示できるはずだが、subGraphの関数のエラー？により描画できず。。
+
+分かる方教えてほしいです。
+
+参考文献は[こちら](https://www.bioconductor.org/packages/devel/bioc/vignettes/Rgraphviz/inst/doc/Rgraphviz.pdf)

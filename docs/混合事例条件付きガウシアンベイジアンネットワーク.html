@@ -54,7 +54,7 @@
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -64,7 +64,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -203,6 +203,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.4" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#ロールアップグラフ"><i class="fa fa-check"></i><b>5.2.4</b> ロールアップグラフ</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#確率的表現-2"><i class="fa fa-check"></i><b>5.3</b> 確率的表現</a></li>
+<li class="chapter" data-level="5.4" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnの学習"><i class="fa fa-check"></i><b>5.4</b> DBNの学習</a></li>
+<li class="chapter" data-level="5.5" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnを使ってみよう"><i class="fa fa-check"></i><b>5.5</b> DBNを使ってみよう</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#屋内適温屋外寒冷風通しは良くないとき風通しがよく適温にするために窓を開けるべきか"><i class="fa fa-check"></i><b>5.5.1</b> 屋内適温、屋外寒冷、風通しは良くないとき、風通しがよく適温にするために窓を開けるべきか？</a></li>
+<li class="chapter" data-level="5.5.2" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#t0で屋外の状態が不明なとき窓を開けるべきか"><i class="fa fa-check"></i><b>5.5.2</b> t0で屋外の状態が不明なとき、窓を開けるべきか</a></li>
+<li class="chapter" data-level="5.5.3" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#このプロセスを自動化する"><i class="fa fa-check"></i><b>5.5.3</b> このプロセスを自動化する</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnの図示"><i class="fa fa-check"></i><b>5.6</b> DBNの図示</a></li>
 </ul></li>
 </ul>
 
@@ -454,7 +462,7 @@ T= 120+1.02I+1.05O+\varepsilon_T\sim N(0,10^2)
 <!--# なぜか0と1の場所が逆になっている -->
 <p>既往歴と入院日数、更にはその相互作用を含めたlm関数で算出する結果は異なるので注意</p>
 <div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb207-1" tabindex="-1"></a>single.model <span class="ot">&lt;-</span> <span class="fu">lm</span>(I <span class="sc">~</span> D <span class="sc">*</span> C, <span class="at">data =</span> costs)</span>
-<span id="cb207-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb207-2" tabindex="-1"></a><span class="fu">coef</span>(sigle.model)</span></code></pre></div>
+<span id="cb207-2"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb207-2" tabindex="-1"></a><span class="fu">coef</span>(single.model)</span></code></pre></div>
 <pre><code>## (Intercept)           D       Cnone     Csevere     D:Cnone   D:Csevere 
 ##  101.340292  549.367410   -1.623135   16.518218 -249.729236  241.297274</code></pre>
 <div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="混合事例条件付きガウシアンベイジアンネットワーク.html#cb209-1" tabindex="-1"></a><span class="fu">sigma</span>(single.model)</span></code></pre></div>

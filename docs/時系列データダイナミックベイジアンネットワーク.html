@@ -54,7 +54,7 @@
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -64,7 +64,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -203,6 +203,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.4" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#ロールアップグラフ"><i class="fa fa-check"></i><b>5.2.4</b> ロールアップグラフ</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#確率的表現-2"><i class="fa fa-check"></i><b>5.3</b> 確率的表現</a></li>
+<li class="chapter" data-level="5.4" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnの学習"><i class="fa fa-check"></i><b>5.4</b> DBNの学習</a></li>
+<li class="chapter" data-level="5.5" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnを使ってみよう"><i class="fa fa-check"></i><b>5.5</b> DBNを使ってみよう</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#屋内適温屋外寒冷風通しは良くないとき風通しがよく適温にするために窓を開けるべきか"><i class="fa fa-check"></i><b>5.5.1</b> 屋内適温、屋外寒冷、風通しは良くないとき、風通しがよく適温にするために窓を開けるべきか？</a></li>
+<li class="chapter" data-level="5.5.2" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#t0で屋外の状態が不明なとき窓を開けるべきか"><i class="fa fa-check"></i><b>5.5.2</b> t0で屋外の状態が不明なとき、窓を開けるべきか</a></li>
+<li class="chapter" data-level="5.5.3" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#このプロセスを自動化する"><i class="fa fa-check"></i><b>5.5.3</b> このプロセスを自動化する</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnの図示"><i class="fa fa-check"></i><b>5.6</b> DBNの図示</a></li>
 </ul></li>
 </ul>
 
@@ -265,9 +273,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <div id="静的dag" class="section level3 hasAnchor" number="5.2.1">
 <h3><span class="header-section-number">5.2.1</span> 静的DAG<a href="時系列データダイナミックベイジアンネットワーク.html#静的dag" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-1" tabindex="-1"></a><span class="co">#時間情報を取り除いた静的DAG</span></span>
-<span id="cb246-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-2" tabindex="-1"></a>dag <span class="ot">&lt;-</span> <span class="fu">model2network</span>(<span class="st">&quot;[W][Tout][Tin|W:Tout][St|W]&quot;</span>)</span>
-<span id="cb246-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-3" tabindex="-1"></a><span class="fu">graphviz.plot</span>(dag)</span></code></pre></div>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-1" tabindex="-1"></a><span class="fu">library</span>(bnlearn)</span>
+<span id="cb246-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-2" tabindex="-1"></a><span class="co">#時間情報を取り除いた静的DAG</span></span>
+<span id="cb246-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-3" tabindex="-1"></a>dag <span class="ot">&lt;-</span> <span class="fu">model2network</span>(<span class="st">&quot;[W][Tout][Tin|W:Tout][St|W]&quot;</span>)</span>
+<span id="cb246-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb246-4" tabindex="-1"></a><span class="fu">graphviz.plot</span>(dag)</span></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
 </div>
 <div id="ナイーブdag" class="section level3 hasAnchor" number="5.2.2">
@@ -299,6 +308,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li>t0時点の窓の開閉がt1時点のTin/Tout/Stいどのように影響するかの、t0時点のWの効果を検討することが目的であるから</li>
 </ul></li>
+<li><p>今回はこれを採用する</p></li>
 </ul>
 </div>
 <div id="ロールアップグラフ" class="section level3 hasAnchor" number="5.2.4">
@@ -328,12 +338,252 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   &lt;18   0.80   0.1 0.01
 ##   18-24 0.19   0.8 0.19
 ##   &gt;24   0.01   0.1 0.80</code></pre>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-1" tabindex="-1"></a>W.lv <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;open&quot;</span>, <span class="st">&quot;closed&quot;</span>)</span>
-<span id="cb249-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-2" tabindex="-1"></a>W0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="at">dim =</span> <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">W0 =</span> W.lv))</span>
-<span id="cb249-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-3" tabindex="-1"></a>W0.prob</span></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-1" tabindex="-1"></a><span class="co">#窓の開閉に関しては確率は0.5と言える</span></span>
+<span id="cb249-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-2" tabindex="-1"></a>W.lv <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;open&quot;</span>, <span class="st">&quot;closed&quot;</span>)</span>
+<span id="cb249-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-3" tabindex="-1"></a>W0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="at">dim =</span> <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">W0 =</span> W.lv))</span>
+<span id="cb249-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb249-4" tabindex="-1"></a>W0.prob</span></code></pre></div>
 <pre><code>## W0
 ##   open closed 
 ##    0.5    0.5</code></pre>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-1" tabindex="-1"></a><span class="co">#風通しの悪さはlow(風通しが良い)とhigh(悪い)のみとしSt0に一様分布を適用することとした</span></span>
+<span id="cb251-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-2" tabindex="-1"></a>St.lv <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;high&quot;</span>)</span>
+<span id="cb251-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-3" tabindex="-1"></a><span class="co">#最初は確率は半分ずつ</span></span>
+<span id="cb251-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-4" tabindex="-1"></a>St0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.50</span>, <span class="fl">0.50</span>), <span class="at">dim =</span> <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">St0 =</span> St.lv))</span>
+<span id="cb251-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-5" tabindex="-1"></a><span class="co">#窓が開いているときは風通しが良い(low)６６６６６６６６６６確率が高くなるように設定</span></span>
+<span id="cb251-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-6" tabindex="-1"></a>St1.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.90</span>, <span class="fl">0.10</span>, <span class="fl">0.70</span>, <span class="fl">0.30</span>, <span class="fl">0.70</span>, </span>
+<span id="cb251-7"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-7" tabindex="-1"></a>                    <span class="fl">0.30</span>, <span class="fl">0.10</span>, <span class="fl">0.90</span>), <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb251-8"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-8" tabindex="-1"></a>                  <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">St1 =</span> St.lv, <span class="at">St0 =</span> St.lv, <span class="at">W0 =</span> W.lv))</span>
+<span id="cb251-9"><a href="時系列データダイナミックベイジアンネットワーク.html#cb251-9" tabindex="-1"></a>St1.prob</span></code></pre></div>
+<pre><code>## , , W0 = open
+## 
+##       St0
+## St1    low high
+##   low  0.9  0.7
+##   high 0.1  0.3
+## 
+## , , W0 = closed
+## 
+##       St0
+## St1    low high
+##   low  0.7  0.1
+##   high 0.3  0.9</code></pre>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-1" tabindex="-1"></a><span class="co">#快適な温度である確率が高くなるように設定</span></span>
+<span id="cb253-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-2" tabindex="-1"></a>Tin0.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.10</span>, <span class="fl">0.85</span>, <span class="fl">0.05</span>), <span class="at">dim =</span> <span class="dv">3</span>,</span>
+<span id="cb253-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-3" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">Tin0 =</span> T.lv))</span>
+<span id="cb253-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-4" tabindex="-1"></a><span class="co">#Tin0と同程度の温度となる確率が高くなるように設定</span></span>
+<span id="cb253-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-5" tabindex="-1"></a><span class="co">#Toutが高い、低いという値に依存して変化するように設定</span></span>
+<span id="cb253-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-6" tabindex="-1"></a><span class="co">#窓の開閉でTin1が変動する確率を変化</span></span>
+<span id="cb253-7"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-7" tabindex="-1"></a><span class="co">#&lt;18から&gt;24へ突然いかないようにした</span></span>
+<span id="cb253-8"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-8" tabindex="-1"></a>Tin1.prob <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(</span>
+<span id="cb253-9"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-9" tabindex="-1"></a>          <span class="co"># W0 = &quot;open&quot;, Tin0 = &quot;&lt;18&quot;</span></span>
+<span id="cb253-10"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-10" tabindex="-1"></a>          <span class="fl">0.875</span>, <span class="fl">0.125</span>, <span class="dv">0</span>, <span class="fl">0.075</span>, <span class="fl">0.9</span>, <span class="fl">0.025</span>, <span class="fl">0.075</span>, <span class="fl">0.7</span>, <span class="fl">0.225</span>,</span>
+<span id="cb253-11"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-11" tabindex="-1"></a>          <span class="co"># W0 = &quot;closed&quot;, Tin0 = &quot;&lt;18&quot;</span></span>
+<span id="cb253-12"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-12" tabindex="-1"></a>          <span class="fl">0.875</span>, <span class="fl">0.125</span>, <span class="dv">0</span>, <span class="fl">0.475</span>, <span class="fl">0.5</span>, <span class="fl">0.025</span>, <span class="fl">0.025</span>, <span class="fl">0.65</span>, <span class="fl">0.325</span>,</span>
+<span id="cb253-13"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-13" tabindex="-1"></a>          <span class="co"># W0 = &quot;open&quot;, Tin0 = &quot;18-24&quot;</span></span>
+<span id="cb253-14"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-14" tabindex="-1"></a>          <span class="fl">0.475</span>, <span class="fl">0.525</span>, <span class="dv">0</span>, <span class="fl">0.075</span>, <span class="fl">0.8</span>, <span class="fl">0.125</span>, <span class="dv">0</span>, <span class="fl">0.875</span>, <span class="fl">0.125</span>,</span>
+<span id="cb253-15"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-15" tabindex="-1"></a>          <span class="co"># W0 = &quot;closed&quot;, Tin0 = &quot;18-24&quot;</span></span>
+<span id="cb253-16"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-16" tabindex="-1"></a>          <span class="fl">0.075</span>, <span class="fl">0.9</span>, <span class="fl">0.025</span>, <span class="dv">0</span>, <span class="fl">0.875</span>, <span class="fl">0.125</span>, <span class="dv">0</span>, <span class="fl">0.475</span>, <span class="fl">0.525</span>,</span>
+<span id="cb253-17"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-17" tabindex="-1"></a>          <span class="co"># W0 = &quot;open&quot;, Tin0 = &quot;&gt;24&quot;</span></span>
+<span id="cb253-18"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-18" tabindex="-1"></a>          <span class="fl">0.15</span>, <span class="fl">0.725</span>, <span class="fl">0.125</span>, <span class="dv">0</span>, <span class="fl">0.475</span>, <span class="fl">0.525</span>, <span class="dv">0</span>, <span class="fl">0.475</span>, <span class="fl">0.525</span>,</span>
+<span id="cb253-19"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-19" tabindex="-1"></a>          <span class="co"># W0 = &quot;closed&quot;, Tin0 = &quot;&gt;24&quot;</span></span>
+<span id="cb253-20"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-20" tabindex="-1"></a>          <span class="dv">0</span>, <span class="fl">0.125</span>, <span class="fl">0.875</span>, <span class="dv">0</span>, <span class="fl">0.075</span>, <span class="fl">0.925</span>, <span class="dv">0</span>, <span class="fl">0.175</span>, <span class="fl">0.825</span>),</span>
+<span id="cb253-21"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-21" tabindex="-1"></a>    <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb253-22"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-22" tabindex="-1"></a>    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">Tin1 =</span> T.lv, <span class="at">Tout1 =</span> T.lv, <span class="at">W0 =</span> W.lv, <span class="at">Tin0 =</span> T.lv))</span>
+<span id="cb253-23"><a href="時系列データダイナミックベイジアンネットワーク.html#cb253-23" tabindex="-1"></a>Tin1.prob</span></code></pre></div>
+<pre><code>## , , W0 = open, Tin0 = &lt;18
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.875 0.075 0.075
+##   18-24 0.125 0.900 0.700
+##   &gt;24   0.000 0.025 0.225
+## 
+## , , W0 = closed, Tin0 = &lt;18
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.875 0.475 0.025
+##   18-24 0.125 0.500 0.650
+##   &gt;24   0.000 0.025 0.325
+## 
+## , , W0 = open, Tin0 = 18-24
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.475 0.075 0.000
+##   18-24 0.525 0.800 0.875
+##   &gt;24   0.000 0.125 0.125
+## 
+## , , W0 = closed, Tin0 = 18-24
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.075 0.000 0.000
+##   18-24 0.900 0.875 0.475
+##   &gt;24   0.025 0.125 0.525
+## 
+## , , W0 = open, Tin0 = &gt;24
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.150 0.000 0.000
+##   18-24 0.725 0.475 0.475
+##   &gt;24   0.125 0.525 0.525
+## 
+## , , W0 = closed, Tin0 = &gt;24
+## 
+##        Tout1
+## Tin1      &lt;18 18-24   &gt;24
+##   &lt;18   0.000 0.000 0.000
+##   18-24 0.125 0.075 0.175
+##   &gt;24   0.875 0.925 0.825</code></pre>
+<p>ダイナミック・ベイジアンネットワークを作成する</p>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb255-1" tabindex="-1"></a>dag <span class="ot">&lt;-</span> <span class="fu">model2network</span>(<span class="fu">paste0</span>(<span class="st">&quot;[W0][St0][Tout0][Tin0][St1|St0:W0]&quot;</span>,</span>
+<span id="cb255-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb255-2" tabindex="-1"></a>             <span class="st">&quot;[Tout1|Tout0][Tin1|Tin0:W0:Tout1]&quot;</span>))</span>
+<span id="cb255-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb255-3" tabindex="-1"></a><span class="fu">graphviz.plot</span>(dag)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-139-1.png" width="672" /></p>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb256-1" tabindex="-1"></a><span class="co">#確率表を組み合わせる</span></span>
+<span id="cb256-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb256-2" tabindex="-1"></a>cpt <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Tout0 =</span> Tout0.prob, <span class="at">Tout1 =</span> Tout1.prob, <span class="at">W0 =</span> W0.prob,</span>
+<span id="cb256-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb256-3" tabindex="-1"></a>         <span class="at">Tin0 =</span> Tin0.prob, <span class="at">Tin1 =</span> Tin1.prob, <span class="at">St0 =</span> St0.prob,</span>
+<span id="cb256-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb256-4" tabindex="-1"></a>         <span class="at">St1 =</span> St1.prob)</span>
+<span id="cb256-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb256-5" tabindex="-1"></a>dbn <span class="ot">&lt;-</span> <span class="fu">custom.fit</span>(dag, cpt)</span></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb257-1" tabindex="-1"></a><span class="fu">nparams</span>(dbn)</span></code></pre></div>
+<pre><code>## [1] 52</code></pre>
+<p>このようにDBNでは必要となるパラメータが容易に増えてしまう</p>
+<p>簡素化を図ったがそれでも多い。</p>
+</div>
+<div id="dbnの学習" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> DBNの学習<a href="時系列データダイナミックベイジアンネットワーク.html#dbnの学習" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb259-1" tabindex="-1"></a><span class="co">#作ったDBNをもとに2000個のサンプルを生成しておく</span></span>
+<span id="cb259-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb259-2" tabindex="-1"></a>domotics <span class="ot">&lt;-</span> <span class="fu">rbn</span>(dbn, <span class="dv">2000</span>)</span>
+<span id="cb259-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb259-3" tabindex="-1"></a><span class="fu">write.table</span>(domotics, <span class="at">file =</span> <span class="st">&quot;data/domotics.txt&quot;</span>)</span></code></pre></div>
+<ul>
+<li><p>DBNに特有の統計手法は特に必要ない</p></li>
+<li><p>一部異なるところがあるので以下で説明する</p></li>
+</ul>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb260-1" tabindex="-1"></a><span class="co">#t0とt1で別々に学習する必要がある</span></span>
+<span id="cb260-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb260-2" tabindex="-1"></a>t0.nodes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;W0&quot;</span>, <span class="st">&quot;St0&quot;</span>, <span class="st">&quot;Tout0&quot;</span>, <span class="st">&quot;Tin0&quot;</span>)</span>
+<span id="cb260-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb260-3" tabindex="-1"></a>t1.nodes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;St1&quot;</span>, <span class="st">&quot;Tout1&quot;</span>, <span class="st">&quot;Tin1&quot;</span>)</span></code></pre></div>
+<p>t0でのノードは単独で存在しており、アークはないためブラックリストに入れる</p>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb261-1" tabindex="-1"></a>bl <span class="ot">&lt;-</span> <span class="fu">set2blacklist</span>(t0.nodes)</span></code></pre></div>
+<p>t1からt0へ向かうすべてのアークに対してブラックリストに入れる</p>
+<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb262-1" tabindex="-1"></a>bl <span class="ot">&lt;-</span> <span class="fu">rbind</span>(bl, <span class="fu">tiers2blacklist</span>(<span class="fu">list</span>(t0.nodes, t1.nodes)))</span>
+<span id="cb262-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb262-2" tabindex="-1"></a>bl</span></code></pre></div>
+<pre><code>##       from    to     
+##  [1,] &quot;St0&quot;   &quot;W0&quot;   
+##  [2,] &quot;Tout0&quot; &quot;W0&quot;   
+##  [3,] &quot;Tin0&quot;  &quot;W0&quot;   
+##  [4,] &quot;W0&quot;    &quot;St0&quot;  
+##  [5,] &quot;Tout0&quot; &quot;St0&quot;  
+##  [6,] &quot;Tin0&quot;  &quot;St0&quot;  
+##  [7,] &quot;W0&quot;    &quot;Tout0&quot;
+##  [8,] &quot;St0&quot;   &quot;Tout0&quot;
+##  [9,] &quot;Tin0&quot;  &quot;Tout0&quot;
+## [10,] &quot;W0&quot;    &quot;Tin0&quot; 
+## [11,] &quot;St0&quot;   &quot;Tin0&quot; 
+## [12,] &quot;Tout0&quot; &quot;Tin0&quot; 
+## [13,] &quot;St1&quot;   &quot;W0&quot;   
+## [14,] &quot;Tout1&quot; &quot;W0&quot;   
+## [15,] &quot;Tin1&quot;  &quot;W0&quot;   
+## [16,] &quot;St1&quot;   &quot;St0&quot;  
+## [17,] &quot;Tout1&quot; &quot;St0&quot;  
+## [18,] &quot;Tin1&quot;  &quot;St0&quot;  
+## [19,] &quot;St1&quot;   &quot;Tout0&quot;
+## [20,] &quot;Tout1&quot; &quot;Tout0&quot;
+## [21,] &quot;Tin1&quot;  &quot;Tout0&quot;
+## [22,] &quot;St1&quot;   &quot;Tin0&quot; 
+## [23,] &quot;Tout1&quot; &quot;Tin0&quot; 
+## [24,] &quot;Tin1&quot;  &quot;Tin0&quot;</code></pre>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb264-1" tabindex="-1"></a><span class="co">#2000個の観測値から予測してみる</span></span>
+<span id="cb264-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb264-2" tabindex="-1"></a>dbn.hc <span class="ot">&lt;-</span> <span class="fu">hc</span>(domotics, <span class="at">blacklist =</span> bl)</span>
+<span id="cb264-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb264-3" tabindex="-1"></a><span class="fu">all.equal</span>(dag, dbn.hc)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb266-1" tabindex="-1"></a><span class="fu">graphviz.plot</span>(dbn.hc)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-146-1.png" width="672" /></p>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb267-1" tabindex="-1"></a><span class="co">#パラメータ推定しておく</span></span>
+<span id="cb267-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb267-2" tabindex="-1"></a>dbn.fit <span class="ot">&lt;-</span> <span class="fu">bn.fit</span>(dbn.hc, domotics)</span></code></pre></div>
+</div>
+<div id="dbnを使ってみよう" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> DBNを使ってみよう<a href="時系列データダイナミックベイジアンネットワーク.html#dbnを使ってみよう" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>予測のために用いる点に注意</p>
+<div id="屋内適温屋外寒冷風通しは良くないとき風通しがよく適温にするために窓を開けるべきか" class="section level3 hasAnchor" number="5.5.1">
+<h3><span class="header-section-number">5.5.1</span> 屋内適温、屋外寒冷、風通しは良くないとき、風通しがよく適温にするために窓を開けるべきか？<a href="時系列データダイナミックベイジアンネットワーク.html#屋内適温屋外寒冷風通しは良くないとき風通しがよく適温にするために窓を開けるべきか" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-1" tabindex="-1"></a><span class="co">#窓を閉めたままパターン</span></span>
+<span id="cb268-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;close:&quot;</span>,</span>
+<span id="cb268-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-3" tabindex="-1"></a>            <span class="fu">cpquery</span>(dbn.fit, <span class="at">event =</span> (St1 <span class="sc">==</span> <span class="st">&quot;low&quot;</span>) <span class="sc">&amp;</span> (Tin1 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>),</span>
+<span id="cb268-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-4" tabindex="-1"></a>                    <span class="at">evidence =</span> (St0 <span class="sc">==</span> <span class="st">&quot;high&quot;</span>) <span class="sc">&amp;</span> (Tin0 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb268-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-5" tabindex="-1"></a>                      (Tout0 <span class="sc">==</span> <span class="st">&quot;&lt;18&quot;</span>) <span class="sc">&amp;</span> (W0 <span class="sc">==</span> <span class="st">&quot;closed&quot;</span>))</span>
+<span id="cb268-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-6" tabindex="-1"></a>            )</span>
+<span id="cb268-7"><a href="時系列データダイナミックベイジアンネットワーク.html#cb268-7" tabindex="-1"></a>      )</span></code></pre></div>
+<pre><code>## [1] &quot;close: 0.0977272727272727&quot;</code></pre>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-1" tabindex="-1"></a><span class="co">#窓を開けたパターン</span></span>
+<span id="cb270-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;open:&quot;</span>, </span>
+<span id="cb270-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-3" tabindex="-1"></a>            <span class="fu">cpquery</span>(dbn.fit, <span class="at">event =</span> (St1 <span class="sc">==</span> <span class="st">&quot;low&quot;</span>) <span class="sc">&amp;</span> (Tin1 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>),</span>
+<span id="cb270-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-4" tabindex="-1"></a>                    <span class="at">evidence =</span> (St0 <span class="sc">==</span> <span class="st">&quot;high&quot;</span>) <span class="sc">&amp;</span> (Tin0 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb270-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-5" tabindex="-1"></a>                      (Tout0 <span class="sc">==</span> <span class="st">&quot;&lt;18&quot;</span>) <span class="sc">&amp;</span> (W0 <span class="sc">==</span> <span class="st">&quot;open&quot;</span>))</span>
+<span id="cb270-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-6" tabindex="-1"></a>            )</span>
+<span id="cb270-7"><a href="時系列データダイナミックベイジアンネットワーク.html#cb270-7" tabindex="-1"></a>      )</span></code></pre></div>
+<pre><code>## [1] &quot;open: 0.491189427312775&quot;</code></pre>
+<p>以上より窓を開けることでより達成に近づくがその確率は0.5を下回っており低い</p>
+</div>
+<div id="t0で屋外の状態が不明なとき窓を開けるべきか" class="section level3 hasAnchor" number="5.5.2">
+<h3><span class="header-section-number">5.5.2</span> t0で屋外の状態が不明なとき、窓を開けるべきか<a href="時系列データダイナミックベイジアンネットワーク.html#t0で屋外の状態が不明なとき窓を開けるべきか" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb272-1" tabindex="-1"></a><span class="fu">cpquery</span>(dbn.fit, <span class="at">event =</span> (St1 <span class="sc">==</span> <span class="st">&quot;low&quot;</span>) <span class="sc">&amp;</span> (Tin1 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>),</span>
+<span id="cb272-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb272-2" tabindex="-1"></a>        <span class="at">evidence =</span> (St0 <span class="sc">==</span> <span class="st">&quot;high&quot;</span>) <span class="sc">&amp;</span> (Tin0 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>) <span class="sc">&amp;</span> (W0 <span class="sc">==</span> <span class="st">&quot;closed&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] 0.09401709</code></pre>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb274-1" tabindex="-1"></a><span class="fu">cpquery</span>(dbn.fit, <span class="at">event =</span> (St1 <span class="sc">==</span> <span class="st">&quot;low&quot;</span>) <span class="sc">&amp;</span> (Tin1 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>),</span>
+<span id="cb274-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb274-2" tabindex="-1"></a>  <span class="at">evidence =</span> (St0 <span class="sc">==</span> <span class="st">&quot;high&quot;</span>) <span class="sc">&amp;</span> (Tin0 <span class="sc">==</span> <span class="st">&quot;18-24&quot;</span>) <span class="sc">&amp;</span> (W0 <span class="sc">==</span> <span class="st">&quot;open&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] 0.5702792</code></pre>
+<p>この結果はTout0における平均的な状態で条件づけた場合の確率を示す</p>
+</div>
+<div id="このプロセスを自動化する" class="section level3 hasAnchor" number="5.5.3">
+<h3><span class="header-section-number">5.5.3</span> このプロセスを自動化する<a href="時系列データダイナミックベイジアンネットワーク.html#このプロセスを自動化する" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb276-1" tabindex="-1"></a>evidence <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">St0 =</span> <span class="fu">factor</span>(<span class="st">&quot;high&quot;</span>, <span class="at">levels =</span> St.lv),</span>
+<span id="cb276-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb276-2" tabindex="-1"></a>              <span class="at">Tin0 =</span> <span class="fu">factor</span>(<span class="st">&quot;18-24&quot;</span>, <span class="at">levels =</span> T.lv),</span>
+<span id="cb276-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb276-3" tabindex="-1"></a>              <span class="at">Tout0 =</span> <span class="fu">factor</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="at">levels =</span> T.lv),</span>
+<span id="cb276-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb276-4" tabindex="-1"></a>              <span class="at">W0 =</span> <span class="fu">factor</span>(<span class="st">&quot;open&quot;</span>, <span class="at">levels =</span> W.lv))</span></code></pre></div>
+<p>t0において観察される状態を生成しておく</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb277-1" tabindex="-1"></a><span class="co">#まずTin1を予測する</span></span>
+<span id="cb277-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb277-2" tabindex="-1"></a><span class="fu">predict</span>(dbn.fit, <span class="at">data =</span> evidence, <span class="at">node =</span> <span class="st">&quot;Tin1&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bayes-lw&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] 18-24
+## Levels: &lt;18 18-24 &gt;24</code></pre>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb279-1" tabindex="-1"></a><span class="co">#Tin1をもとに続いてSt1の状態を予測する</span></span>
+<span id="cb279-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb279-2" tabindex="-1"></a>evidence<span class="sc">$</span>Tin1 <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="st">&quot;18-24&quot;</span>, <span class="at">levels =</span> T.lv)</span>
+<span id="cb279-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb279-3" tabindex="-1"></a><span class="fu">predict</span>(dbn.fit, <span class="at">data =</span> evidence, <span class="at">node =</span> <span class="st">&quot;St1&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bayes-lw&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] low
+## Levels: low high</code></pre>
+<p>lowとなったことから、openにすることで適温かつ風通しが良い状態になることが予測される</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-1" tabindex="-1"></a><span class="co">#逆にclosedにするとhighとなり風通しが悪くなることが予想される</span></span>
+<span id="cb281-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-2" tabindex="-1"></a>evidence <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">St0 =</span> <span class="fu">factor</span>(<span class="st">&quot;high&quot;</span>, <span class="at">levels =</span> St.lv),</span>
+<span id="cb281-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-3" tabindex="-1"></a>              <span class="at">Tin0 =</span> <span class="fu">factor</span>(<span class="st">&quot;18-24&quot;</span>, <span class="at">levels =</span> T.lv),</span>
+<span id="cb281-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-4" tabindex="-1"></a>              <span class="at">Tout0 =</span> <span class="fu">factor</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="at">levels =</span> T.lv),</span>
+<span id="cb281-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-5" tabindex="-1"></a>              <span class="at">W0 =</span> <span class="fu">factor</span>(<span class="st">&quot;closed&quot;</span>, <span class="at">levels =</span> W.lv))</span>
+<span id="cb281-6"><a href="時系列データダイナミックベイジアンネットワーク.html#cb281-6" tabindex="-1"></a><span class="fu">predict</span>(dbn.fit, <span class="at">data =</span> evidence, <span class="at">node =</span> <span class="st">&quot;Tin1&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bayes-lw&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] 18-24
+## Levels: &lt;18 18-24 &gt;24</code></pre>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb283-1" tabindex="-1"></a>evidence<span class="sc">$</span>Tin1 <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="st">&quot;18-24&quot;</span>, <span class="at">levels =</span> T.lv)</span>
+<span id="cb283-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb283-2" tabindex="-1"></a><span class="fu">predict</span>(dbn.fit, <span class="at">data =</span> evidence, <span class="at">node =</span> <span class="st">&quot;St1&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bayes-lw&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] high
+## Levels: low high</code></pre>
+</div>
+</div>
+<div id="dbnの図示" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> DBNの図示<a href="時系列データダイナミックベイジアンネットワーク.html#dbnの図示" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>DAGは左から右に流れるように表示する</li>
+</ul>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb285-1" tabindex="-1"></a><span class="fu">library</span>(Rgraphviz)</span>
+<span id="cb285-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb285-2" tabindex="-1"></a><span class="co">#一旦グラフオブジェクトを作成する</span></span>
+<span id="cb285-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb285-3" tabindex="-1"></a>gR <span class="ot">&lt;-</span> <span class="fu">graphviz.plot</span>(dag)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-154-1.png" width="672" /></p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="時系列データダイナミックベイジアンネットワーク.html#cb286-1" tabindex="-1"></a><span class="co">#t0とt1でグルーピングする</span></span>
+<span id="cb286-2"><a href="時系列データダイナミックベイジアンネットワーク.html#cb286-2" tabindex="-1"></a>t0.nodes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;W0&quot;</span>, <span class="st">&quot;St0&quot;</span>, <span class="st">&quot;Tout0&quot;</span>, <span class="st">&quot;Tin0&quot;</span>)</span>
+<span id="cb286-3"><a href="時系列データダイナミックベイジアンネットワーク.html#cb286-3" tabindex="-1"></a>t1.nodes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;St1&quot;</span>, <span class="st">&quot;Tout1&quot;</span>, <span class="st">&quot;Tin1&quot;</span>)</span>
+<span id="cb286-4"><a href="時系列データダイナミックベイジアンネットワーク.html#cb286-4" tabindex="-1"></a><span class="co">#sg0 &lt;- list(graph = subGraph(t0.nodes, gR), cluster = TRUE)</span></span>
+<span id="cb286-5"><a href="時系列データダイナミックベイジアンネットワーク.html#cb286-5" tabindex="-1"></a><span class="co">#sg1 &lt;- list(graph = subGraph(t1.nodes, gR), cluster = TRUE)</span></span></code></pre></div>
+<p>ここで各ノードをグループ化していい感じに表示できるはずだが、subGraphの関数のエラー？により描画できず。。</p>
+<p>分かる方教えてほしいです。</p>
+<p>参考文献は<a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/Rgraphviz/inst/doc/Rgraphviz.pdf">こちら</a></p>
 
 </div>
 </div>
