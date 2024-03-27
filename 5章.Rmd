@@ -1,0 +1,206 @@
+# より複雑な事例：汎用ベイジアンネットワーク
+
+変量効果を伴ったさらに一般的なケース
+
+## 事例紹介：救命救急科の待ち時間
+
+| 項目                     | 型   | 略語 | 説明                                           |
+|--------------|--------------|--------------|--------------------------------|
+| 年齢                     | 連続 | A    |                                                |
+| インシデントのタイプ     | 離散 | I    | 家庭内、交通事故、業務上、その他               |
+| トラウマスコア           | 連続 | S    | その患者が治療を必要とする緊急性の程度（0-12） |
+| 病床利用率               | 連続 | O    |                                                |
+| 到着時間帯               | 連続 | T    |                                                |
+| トリアージに係る待ち時間 | 連続 | W    |                                                |
+
+## グラフィカル及び確率的表現
+
+```{r}
+library(bnlearn)
+dag <- model2network("[I][A][S|I:A][O][T][W|S:O:T]")
+graphviz.plot(dag)
+```
+
+より現実的な方法で専門知識を利用して自由なモデリングを実施する
+
+### I：多項分布の確率変数をともなうモデル
+
+| インシデント     | 確率  |
+|------------------|-------|
+| 家庭内：domestic | 0.50  |
+| 交通事故：road   | 0.075 |
+| 業務上：word     | 0.25  |
+| その他：other    | 0.175 |
+
+### A: β分布
+
+NHSデータでは0-100歳を5歳単位で分割しているが、パラメータが20必要になるためベータ分布を用いることとする
+
+$$
+A \sim\lceil Beta(1.1,1.5) \cdot 100 \rfloor
+$$
+
+これにより運ばれる人の年齢分布の主要な特徴を示す。
+
+人口の分布と、年齢別の運ばれる確率を掛け合わせると以下のようなグラフが得られる、らしい。
+
+これは統計的な情報から算出し、それっぽいグラフを作っているということ
+
+```{r}
+hist(round(100 * rbeta(10^6, shape1 = 1.1, shape2 = 1.5)),
+  xlab = "Age", ylab = "probability", main = "", freq = FALSE,
+  xlim = c(0, 100), axes = FALSE)
+axis(2, label = FALSE)
+axis(1)
+```
+
+### S:トラウマスコア：各ポイントの二項確率をロジスティック回帰で決定
+
+トラウマスコアは0-12の整数だが実際には0-2が使われることはほとんどない
+
+$$
+log(\frac{p}{1-p}) = \beta_0+\beta_1A+\beta_2 \mathbb{I}(I=road)+\beta_3 \mathbb{I}(I=work)+\beta_4 \mathbb{I}(I=other)
+$$
+
+-   ベースライン($\beta_0$：最も起こりやすい出来事である家庭内インシデント）を基準
+
+    -   7を設定
+
+-   ベースラインが加齢（$\beta_1A$）とともに
+
+    -   1ポイント(20歳増えるごとに加算）につき$\beta_1=-0.05$
+
+-   かつ各種インシデントの平均的な患者の重度によって調節されるような形式
+
+    -   $\beta_2=-4,\beta_3=-3,\beta_4=-1$
+
+### O:病床利用率：ベータ分布
+
+統計より、平均は0.90, 密度は0.80から0.99に集中する
+
+$$
+O\sim Beta(12,2)
+$$
+
+```{r}
+hist(rbeta(10^6, shape1 = 12, shape2 = 2),
+  xlab = "Occupancy Rate", ylab = "probability", main = "", freq = FALSE,
+  xlim = c(0, 1), axes = FALSE)
+axis(2, label = FALSE)
+axis(1, at = c(0, 0.5, 0.75, 0.85, 0.95, 1))
+
+```
+
+### T:到着時間帯：周期関数
+
+ある日から翌日になるような連続性を保証するために時間の周期性を定義する確率密度関数を用いる
+
+-   フォン・ミーゼス分布
+
+    -   [-π,π]にかけて定義
+
+    -   $\mu$（どの時間帯にピークを迎えるか）、$\kappa$（ピークに係る尖度）のパラメータをもつ
+
+$$
+B\sim\frac{vonMises(0.001,2)-\pi}{2\pi}\cdot24
+$$
+
+-   運ばれてくる可能性が高い時間帯をAM10-12とし、夜間は少なく見込む
+
+```{r}
+library(circular)
+hist(as.numeric(rvonmises(10000, 0.0001 - pi, 2) / (2 * pi) * 24),
+  xlab = "Time of the day", ylab = "probability",  main = "", freq = FALSE,
+  xlim = c(0, 24), axes = FALSE)
+axis(2, label = FALSE)
+axis(1, at = c(0, 4, 8, 12, 16, 20, 24))
+```
+
+### W:トリアージにかかる待ち時間：対数正規分布をともなう確率変数
+
+$$
+log(W)\sim N(\mu,\sigma^2)
+$$
+
+$$
+\mu=\gamma_0+\gamma_1O+\gamma_2(12-S)+\gamma_3max\{0,6-|T-12|\}
+$$
+
+-   待ち時間のベースライン（T=0, S=12）を20分と想定
+
+-   病床利用率Oを常時0.50と設定
+
+-   その他詳細はいろいろあるが省略する
+
+## Stanを使ってモデル構築
+
+Stanはなんらかの情報が与えられた場合の分布からランダムサンプリングを実行する能力に長けている→samplerそのもの
+
+```{r}
+library(rstan)
+```
+
+### データの生成
+
+入力・モデル・出力を宣言するためのブロックで構成される
+
+```{r}
+#パラメータは初期化はされるが宣言されない
+stancode <- '
+data {
+  vector[2] Ap; // shape parameters for the beta distribution.
+  vector[4] Ip; // probabilities for incident types.
+  vector[6] Sp; // regression coefficients, logistic regression.
+  vector[2] Op; // parameters for the beta distribution.
+  vector[2] Tp; // parameters for the von Mises distribution.
+  vector[5] Wp; // regression coefficients, log-linear regression.
+}
+generated quantities {
+  real A;
+  int I;
+  real S;
+  real O;
+  real W;
+  real T;
+  A = ceil(beta_rng(Ap[1], Ap[2]) * 100);
+  I = categorical_rng(Ip);
+  S = 2 + binomial_rng(10, inv_logit(Sp[1] + A * Sp[2] + Sp[2 + I]));
+  O = beta_rng(Op[1], Op[2]);
+  T = (von_mises_rng(Tp[1], Tp[2]) + pi()) / (2 * pi()) * 24;
+  W = lognormal_rng(Wp[1] + O * Wp[2] + (12 - S) * Wp[3] +
+                    fmax(6 - fabs(T - 12), 0) * Wp[4], Wp[5]);
+}
+  '
+```
+
+```{r}
+#モデルをコンパイル
+data.model <- stan_model(model_code = stancode)
+```
+
+```{r}
+#サンプリング関数にわたしてランダムサンプリングを実行
+params <- list(
+  Ap = c(1.1, 1.5),
+  Ip = c(0.075, 0.50, 0.25, 0.175),
+  Sp = c(7, -0.05, 0, -4, -3, -1),
+  Op = c(12, 2),
+  Tp = c(0.001, 2),
+  Wp = c(log(20), 2 * log(2), -0.5 * log(2), 0.25 * log(2), 1)
+)
+#パラメータそのものを固定させている
+#thinでサンプル同士ができる限り独立するように25サンプルごとに1サンプル使用する間引きを実施
+fit <- sampling(data.model, algorithm = "Fixed_param",
+         data = params, thin = 25, iter = 50000, seed = 42)
+nodes <- c("A", "I", "S", "O", "T", "W")
+aewait <- as.data.frame(extract(fit)[nodes])
+```
+
+```{r}
+#インシデントのカテゴリをラベル付けした因子型に変換する
+aewait$I <- factor(aewait$I,
+              labels = c("domestic", "road", "work", "other"))
+head(aewait)
+```
+
+### 変数に関する確認

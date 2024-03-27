@@ -29,7 +29,7 @@
   
   
 <link rel="prev" href="混合事例条件付きガウシアンベイジアンネットワーク.html"/>
-
+<link rel="next" href="より複雑な事例汎用ベイジアンネットワーク.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -211,6 +211,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5.3" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#このプロセスを自動化する"><i class="fa fa-check"></i><b>5.5.3</b> このプロセスを自動化する</a></li>
 </ul></li>
 <li class="chapter" data-level="5.6" data-path="時系列データダイナミックベイジアンネットワーク.html"><a href="時系列データダイナミックベイジアンネットワーク.html#dbnの図示"><i class="fa fa-check"></i><b>5.6</b> DBNの図示</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html"><i class="fa fa-check"></i><b>6</b> より複雑な事例：汎用ベイジアンネットワーク</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#事例紹介救命救急科の待ち時間"><i class="fa fa-check"></i><b>6.1</b> 事例紹介：救命救急科の待ち時間</a></li>
+<li class="chapter" data-level="6.2" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#グラフィカル及び確率的表現"><i class="fa fa-check"></i><b>6.2</b> グラフィカル及び確率的表現</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#i多項分布の確率変数をともなうモデル"><i class="fa fa-check"></i><b>6.2.1</b> I：多項分布の確率変数をともなうモデル</a></li>
+<li class="chapter" data-level="6.2.2" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#a-β分布"><i class="fa fa-check"></i><b>6.2.2</b> A: β分布</a></li>
+<li class="chapter" data-level="6.2.3" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#sトラウマスコア各ポイントの二項確率をロジスティック回帰で決定"><i class="fa fa-check"></i><b>6.2.3</b> S:トラウマスコア：各ポイントの二項確率をロジスティック回帰で決定</a></li>
+<li class="chapter" data-level="6.2.4" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#o病床利用率ベータ分布"><i class="fa fa-check"></i><b>6.2.4</b> O:病床利用率：ベータ分布</a></li>
+<li class="chapter" data-level="6.2.5" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#t到着時間帯周期関数"><i class="fa fa-check"></i><b>6.2.5</b> T:到着時間帯：周期関数</a></li>
+<li class="chapter" data-level="6.2.6" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#wトリアージにかかる待ち時間対数正規分布をともなう確率変数"><i class="fa fa-check"></i><b>6.2.6</b> W:トリアージにかかる待ち時間：対数正規分布をともなう確率変数</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#stanを使ってモデル構築"><i class="fa fa-check"></i><b>6.3</b> Stanを使ってモデル構築</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#データの生成"><i class="fa fa-check"></i><b>6.3.1</b> データの生成</a></li>
+<li class="chapter" data-level="6.3.2" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#変数に関する確認"><i class="fa fa-check"></i><b>6.3.2</b> 変数に関する確認</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -592,8 +610,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="混合事例条件付きガウシアンベイジアンネットワーク.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="混合事例条件付きガウシアンベイジアンネットワーク.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="より複雑な事例汎用ベイジアンネットワーク.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
