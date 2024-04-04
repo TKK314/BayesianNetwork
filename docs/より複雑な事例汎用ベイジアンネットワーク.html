@@ -229,6 +229,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3.1" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#データの生成"><i class="fa fa-check"></i><b>6.3.1</b> データの生成</a></li>
 <li class="chapter" data-level="6.3.2" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#変数に関する確認"><i class="fa fa-check"></i><b>6.3.2</b> 変数に関する確認</a></li>
 </ul></li>
+<li class="chapter" data-level="6.4" data-path="より複雑な事例汎用ベイジアンネットワーク.html"><a href="より複雑な事例汎用ベイジアンネットワーク.html#stanを使ったパラメータ推定"><i class="fa fa-check"></i><b>6.4</b> Stanを使ったパラメータ推定</a></li>
 </ul></li>
 </ul>
 
@@ -254,10 +255,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">6.1</span> 事例紹介：救命救急科の待ち時間<a href="より複雑な事例汎用ベイジアンネットワーク.html#事例紹介救命救急科の待ち時間" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table>
 <colgroup>
-<col width="18%" />
-<col width="18%" />
-<col width="18%" />
-<col width="43%" />
+<col width="21%" />
+<col width="16%" />
+<col width="16%" />
+<col width="45%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -495,8 +496,8 @@ log(W)\sim N(\mu,\sigma^2)
 ## Chain 1: Iteration: 50000 / 50000 [100%]  (Sampling)
 ## Chain 1: 
 ## Chain 1:  Elapsed Time: 0 seconds (Warm-up)
-## Chain 1:                0.007 seconds (Sampling)
-## Chain 1:                0.007 seconds (Total)
+## Chain 1:                0.006 seconds (Sampling)
+## Chain 1:                0.006 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 2).
@@ -513,8 +514,8 @@ log(W)\sim N(\mu,\sigma^2)
 ## Chain 2: Iteration: 50000 / 50000 [100%]  (Sampling)
 ## Chain 2: 
 ## Chain 2:  Elapsed Time: 0 seconds (Warm-up)
-## Chain 2:                0.005 seconds (Sampling)
-## Chain 2:                0.005 seconds (Total)
+## Chain 2:                0.007 seconds (Sampling)
+## Chain 2:                0.007 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 3).
@@ -531,8 +532,8 @@ log(W)\sim N(\mu,\sigma^2)
 ## Chain 3: Iteration: 50000 / 50000 [100%]  (Sampling)
 ## Chain 3: 
 ## Chain 3:  Elapsed Time: 0 seconds (Warm-up)
-## Chain 3:                0.006 seconds (Sampling)
-## Chain 3:                0.006 seconds (Total)
+## Chain 3:                0.005 seconds (Sampling)
+## Chain 3:                0.005 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;anon_model&#39; NOW (CHAIN 4).
@@ -549,8 +550,8 @@ log(W)\sim N(\mu,\sigma^2)
 ## Chain 4: Iteration: 50000 / 50000 [100%]  (Sampling)
 ## Chain 4: 
 ## Chain 4:  Elapsed Time: 0 seconds (Warm-up)
-## Chain 4:                0.005 seconds (Sampling)
-## Chain 4:                0.005 seconds (Total)
+## Chain 4:                0.007 seconds (Sampling)
+## Chain 4:                0.007 seconds (Total)
 ## Chain 4:</code></pre>
 <div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb296-1" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;T&quot;</span>, <span class="st">&quot;W&quot;</span>)</span>
 <span id="cb296-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb296-2" tabindex="-1"></a>aewait <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">extract</span>(fit)[nodes])</span></code></pre></div>
@@ -568,8 +569,117 @@ log(W)\sim N(\mu,\sigma^2)
 </div>
 <div id="変数に関する確認" class="section level3 hasAnchor" number="6.3.2">
 <h3><span class="header-section-number">6.3.2</span> 変数に関する確認<a href="より複雑な事例汎用ベイジアンネットワーク.html#変数に関する確認" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-
+<ul>
+<li><p>BNは理論的視点からでも現実的視点からでも検討できる</p></li>
+<li><p>前項で設定したパラメータが現実を反映したモデルとなっているかどうかをチェックする</p></li>
+</ul>
+<div id="トラウマスコアs" class="section level4 hasAnchor" number="6.3.2.1">
+<h4><span class="header-section-number">6.3.2.1</span> トラウマスコア(S)<a href="より複雑な事例汎用ベイジアンネットワーク.html#トラウマスコアs" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>経験分布関数を使ってSに関する状態を確認する</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb299-1" tabindex="-1"></a>S.cdf <span class="ot">&lt;-</span> <span class="fu">ecdf</span>(aewait<span class="sc">$</span>S)</span>
+<span id="cb299-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb299-2" tabindex="-1"></a><span class="fu">S.cdf</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">11</span>,<span class="dv">12</span>))</span></code></pre></div>
+<pre><code>## [1] 0.02825 0.20500 0.47025 0.65500 1.00000</code></pre>
+<p>トラウマスコアが0-3に該当する患者は少ないことがわかる</p>
+<p>それ以外の分布についてもおおよそ一致している</p>
 </div>
+<div id="トリアージに係る時間w" class="section level4 hasAnchor" number="6.3.2.2">
+<h4><span class="header-section-number">6.3.2.2</span> トリアージに係る時間(W)<a href="より複雑な事例汎用ベイジアンネットワーク.html#トリアージに係る時間w" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb301-1" tabindex="-1"></a>W.cdf <span class="ot">&lt;-</span> <span class="fu">ecdf</span>(aewait<span class="sc">$</span>W)</span>
+<span id="cb301-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb301-2" tabindex="-1"></a><span class="fu">W.cdf</span>(<span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dv">60</span>,<span class="dv">120</span>,<span class="dv">180</span>,<span class="dv">240</span>))</span></code></pre></div>
+<pre><code>## [1] 0.11875 0.31025 0.48775 0.69125 0.80075 0.86350</code></pre>
+<p>86%の患者が4時間以内に医師の診断を受けている。</p>
+<p>半数の患者が60分以内に診断を受けている</p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb303-1" tabindex="-1"></a>nS <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">which</span>(aewait<span class="sc">$</span>S <span class="sc">&lt;=</span> <span class="dv">3</span>))</span>
+<span id="cb303-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb303-2" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>((aewait<span class="sc">$</span>S <span class="sc">&lt;=</span> <span class="dv">3</span>) <span class="sc">&amp;</span> (aewait<span class="sc">$</span>W <span class="sc">&lt;</span> <span class="dv">10</span>))) <span class="sc">/</span> nS</span></code></pre></div>
+<pre><code>## [1] 0.7256637</code></pre>
+<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb305-1" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>((aewait<span class="sc">$</span>S <span class="sc">&lt;=</span> <span class="dv">3</span>) <span class="sc">&amp;</span> (aewait<span class="sc">$</span>W <span class="sc">&lt;</span> <span class="dv">30</span>))) <span class="sc">/</span> nS</span></code></pre></div>
+<pre><code>## [1] 0.920354</code></pre>
+<p>危篤患者(スコアが3以下）は10分以内に73%、30分以内にほとんどの人が診断を受けている</p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb307-1" tabindex="-1"></a>nW <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">which</span>(aewait<span class="sc">$</span>W <span class="sc">&gt;</span> <span class="dv">240</span>))</span>
+<span id="cb307-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb307-2" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>((aewait<span class="sc">$</span>S <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">&amp;</span> (aewait<span class="sc">$</span>W <span class="sc">&gt;</span> <span class="dv">240</span>))) <span class="sc">/</span> nW</span></code></pre></div>
+<pre><code>## [1] 0.959707</code></pre>
+<p>逆にスコアが10以上の患者では4時間以上の待ち時間が発生していることがほとんどであるとわかる</p>
+</div>
+</div>
+</div>
+<div id="stanを使ったパラメータ推定" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Stanを使ったパラメータ推定<a href="より複雑な事例汎用ベイジアンネットワーク.html#stanを使ったパラメータ推定" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>今までは分布とパラメータを設定することでBNを構築し、構築したBNからランダム観測値を生成した</p>
+<p>今回は、その逆で各ノードについてランダム観測値で条件付けそれらのパラメータの同時事後分布からランダムサンプリングを実行する</p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-1" tabindex="-1"></a>stancode <span class="ot">&lt;-</span> <span class="st">&#39;</span></span>
+<span id="cb309-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-2" tabindex="-1"></a><span class="st">data {</span></span>
+<span id="cb309-3"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-3" tabindex="-1"></a><span class="st">  int&lt;lower=1&gt; n;</span></span>
+<span id="cb309-4"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-4" tabindex="-1"></a><span class="st">  vector&lt;lower=0,upper=1&gt;[n] A;</span></span>
+<span id="cb309-5"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-5" tabindex="-1"></a><span class="st">  int&lt;lower=1,upper=4&gt; I[n];</span></span>
+<span id="cb309-6"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-6" tabindex="-1"></a><span class="st">  matrix[n, 4] Im;</span></span>
+<span id="cb309-7"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-7" tabindex="-1"></a><span class="st">  int&lt;lower=0,upper=10&gt; S[n];</span></span>
+<span id="cb309-8"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-8" tabindex="-1"></a><span class="st">  vector&lt;lower=0,upper=10&gt;[n] Scomp;</span></span>
+<span id="cb309-9"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-9" tabindex="-1"></a><span class="st">  vector&lt;lower=0,upper=1&gt;[n] O;</span></span>
+<span id="cb309-10"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-10" tabindex="-1"></a><span class="st">  vector&lt;lower=-pi(),upper=pi()&gt;[n] T;</span></span>
+<span id="cb309-11"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-11" tabindex="-1"></a><span class="st">  vector&lt;lower=0,upper=6&gt;[n] Ttri;</span></span>
+<span id="cb309-12"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-12" tabindex="-1"></a><span class="st">  vector&lt;lower=0&gt;[n] W;</span></span>
+<span id="cb309-13"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-13" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb309-14"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-14" tabindex="-1"></a><span class="st">parameters {</span></span>
+<span id="cb309-15"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-15" tabindex="-1"></a><span class="st">  real&lt;lower=0&gt; Ap[2];</span></span>
+<span id="cb309-16"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-16" tabindex="-1"></a><span class="st">  simplex[4] Ip;</span></span>
+<span id="cb309-17"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-17" tabindex="-1"></a><span class="st">  vector[4] Sbeta;</span></span>
+<span id="cb309-18"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-18" tabindex="-1"></a><span class="st">  real Sa;</span></span>
+<span id="cb309-19"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-19" tabindex="-1"></a><span class="st">  real&lt;lower=0&gt; Op[2];</span></span>
+<span id="cb309-20"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-20" tabindex="-1"></a><span class="st">  real&lt;lower=-pi(),upper=pi()&gt; Tmu;</span></span>
+<span id="cb309-21"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-21" tabindex="-1"></a><span class="st">  real&lt;lower=0&gt; Ts;</span></span>
+<span id="cb309-22"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-22" tabindex="-1"></a><span class="st">  real Wp[4];</span></span>
+<span id="cb309-23"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-23" tabindex="-1"></a><span class="st">  real&lt;lower=0&gt; Ws;</span></span>
+<span id="cb309-24"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-24" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb309-25"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-25" tabindex="-1"></a><span class="st">model {</span></span>
+<span id="cb309-26"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-26" tabindex="-1"></a><span class="st">  A ~ beta(Ap[1], Ap[2]);</span></span>
+<span id="cb309-27"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-27" tabindex="-1"></a><span class="st">  I ~ categorical(Ip);</span></span>
+<span id="cb309-28"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-28" tabindex="-1"></a><span class="st">  S ~ binomial_logit(10, A * Sa + Im * Sbeta);</span></span>
+<span id="cb309-29"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-29" tabindex="-1"></a><span class="st">  O ~ beta(Op[1], Op[2]);</span></span>
+<span id="cb309-30"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-30" tabindex="-1"></a><span class="st">  T ~ von_mises(Tmu, Ts);</span></span>
+<span id="cb309-31"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-31" tabindex="-1"></a><span class="st">  W ~ lognormal(Wp[1] + O * Wp[2] + Scomp * Wp[3] + Ttri * Wp[4], Ws);</span></span>
+<span id="cb309-32"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb309-32" tabindex="-1"></a><span class="st">}&#39;</span></span></code></pre></div>
+<ul>
+<li><p>data</p>
+<ul>
+<li>サンプルサイズ(n)、変数を宣言</li>
+</ul></li>
+<li><p>parameters</p>
+<ul>
+<li>事後分布からサンプリングするパラメータを宣言</li>
+</ul></li>
+<li><p>model</p>
+<ul>
+<li>ベイジアンネットワークの確率表現を宣言</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>データからパラメータ推定はするが、その確率分布のそもそもの形などは事前に決定しておく必要があるっぽい</p>
+</blockquote>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb310-1" tabindex="-1"></a>Im <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> I, <span class="at">data =</span> aewait)</span>
+<span id="cb310-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb310-2" tabindex="-1"></a>I <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(aewait<span class="sc">$</span>I)</span></code></pre></div>
+<p>StanではRオブジェクトは扱えないので、サンプルサイズを渡してインシデント(I)に関するモデル行列を作成する必要がある</p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb311-1" tabindex="-1"></a><span class="fu">head</span>(Im)</span></code></pre></div>
+<pre><code>##   (Intercept) Iroad Iwork Iother
+## 1           1     1     0      0
+## 2           1     1     0      0
+## 3           1     0     0      1
+## 4           1     0     1      0
+## 5           1     1     0      0
+## 6           1     0     1      0</code></pre>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb313-1" tabindex="-1"></a><span class="fu">head</span>(I)</span></code></pre></div>
+<pre><code>## [1] 2 2 4 3 2 3</code></pre>
+<p>そのほかいろいろと前処理を行う</p>
+<p>stanコードでもできるが、Rで行った方が早くて簡便</p>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-1" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(aewait<span class="sc">$</span>A <span class="sc">/</span> <span class="dv">100</span>)</span>
+<span id="cb315-2"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-2" tabindex="-1"></a>A[A <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> .Machine<span class="sc">$</span>double.eps</span>
+<span id="cb315-3"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-3" tabindex="-1"></a>A[A <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> .Machine<span class="sc">$</span>double.eps</span>
+<span id="cb315-4"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-4" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(aewait<span class="sc">$</span>S <span class="sc">-</span> <span class="dv">2</span>)</span>
+<span id="cb315-5"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-5" tabindex="-1"></a>Scomp <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="sc">-</span> S;</span>
+<span id="cb315-6"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-6" tabindex="-1"></a>T <span class="ot">&lt;-</span> aewait<span class="sc">$</span>T <span class="sc">/</span> <span class="dv">24</span> <span class="sc">*</span> (<span class="dv">2</span> <span class="sc">*</span> pi) <span class="sc">-</span>pi</span>
+<span id="cb315-7"><a href="より複雑な事例汎用ベイジアンネットワーク.html#cb315-7" tabindex="-1"></a>Ttri <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">6</span> <span class="sc">-</span> <span class="fu">abs</span>(aewait<span class="sc">$</span>T <span class="sc">-</span> <span class="dv">12</span>), <span class="dv">0</span>)</span></code></pre></div>
+<p>前処理後modelをコンパイルしてサンプリングを実行する</p>
+<p>20パラメータの同時分布からサンプリングするので実行速度が非常に遅い</p>
+
 </div>
 </div>
             </section>

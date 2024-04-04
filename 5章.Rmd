@@ -5,7 +5,7 @@
 ## 事例紹介：救命救急科の待ち時間
 
 | 項目                     | 型   | 略語 | 説明                                           |
-|--------------|--------------|--------------|--------------------------------|
+|----------------|------------|------------|---------------------------------|
 | 年齢                     | 連続 | A    |                                                |
 | インシデントのタイプ     | 離散 | I    | 家庭内、交通事故、業務上、その他               |
 | トラウマスコア           | 連続 | S    | その患者が治療を必要とする緊急性の程度（0-12） |
@@ -204,3 +204,143 @@ head(aewait)
 ```
 
 ### 変数に関する確認
+
+-   BNは理論的視点からでも現実的視点からでも検討できる
+
+-   前項で設定したパラメータが現実を反映したモデルとなっているかどうかをチェックする
+
+#### トラウマスコア(S)
+
+経験分布関数を使ってSに関する状態を確認する
+
+```{r}
+S.cdf <- ecdf(aewait$S)
+S.cdf(c(3,7,10,11,12))
+```
+
+トラウマスコアが0-3に該当する患者は少ないことがわかる
+
+それ以外の分布についてもおおよそ一致している
+
+#### トリアージに係る時間(W)
+
+```{r}
+W.cdf <- ecdf(aewait$W)
+W.cdf(c(10,30,60,120,180,240))
+```
+
+86%の患者が4時間以内に医師の診断を受けている。
+
+半数の患者が60分以内に診断を受けている
+
+```{r}
+nS <- length(which(aewait$S <= 3))
+length(which((aewait$S <= 3) & (aewait$W < 10))) / nS
+```
+
+```{r}
+length(which((aewait$S <= 3) & (aewait$W < 30))) / nS
+```
+
+危篤患者(スコアが3以下）は10分以内に73%、30分以内にほとんどの人が診断を受けている
+
+```{r}
+nW <- length(which(aewait$W > 240))
+length(which((aewait$S >= 10) & (aewait$W > 240))) / nW
+```
+
+逆にスコアが10以上の患者では4時間以上の待ち時間が発生していることがほとんどであるとわかる
+
+## Stanを使ったパラメータ推定
+
+今までは分布とパラメータを設定することでBNを構築し、構築したBNからランダム観測値を生成した
+
+今回は、その逆で各ノードについてランダム観測値で条件付けそれらのパラメータの同時事後分布からランダムサンプリングを実行する
+
+```{r}
+stancode <- '
+data {
+  int<lower=1> n;
+  vector<lower=0,upper=1>[n] A;
+  int<lower=1,upper=4> I[n];
+  matrix[n, 4] Im;
+  int<lower=0,upper=10> S[n];
+  vector<lower=0,upper=10>[n] Scomp;
+  vector<lower=0,upper=1>[n] O;
+  vector<lower=-pi(),upper=pi()>[n] T;
+  vector<lower=0,upper=6>[n] Ttri;
+  vector<lower=0>[n] W;
+}
+parameters {
+  real<lower=0> Ap[2];
+  simplex[4] Ip;
+  vector[4] Sbeta;
+  real Sa;
+  real<lower=0> Op[2];
+  real<lower=-pi(),upper=pi()> Tmu;
+  real<lower=0> Ts;
+  real Wp[4];
+  real<lower=0> Ws;
+}
+model {
+  A ~ beta(Ap[1], Ap[2]);
+  I ~ categorical(Ip);
+  S ~ binomial_logit(10, A * Sa + Im * Sbeta);
+  O ~ beta(Op[1], Op[2]);
+  T ~ von_mises(Tmu, Ts);
+  W ~ lognormal(Wp[1] + O * Wp[2] + Scomp * Wp[3] + Ttri * Wp[4], Ws);
+}'
+```
+
+-   data
+
+    -   サンプルサイズ(n)、変数を宣言
+
+-   parameters
+
+    -   事後分布からサンプリングするパラメータを宣言
+
+-   model
+
+    -   ベイジアンネットワークの確率表現を宣言
+
+> データからパラメータ推定はするが、その確率分布のそもそもの形などは事前に決定しておく必要があるっぽい
+
+```{r}
+Im <- model.matrix(~ I, data = aewait)
+I <- as.integer(aewait$I)
+```
+
+StanではRオブジェクトは扱えないので、サンプルサイズを渡してインシデント(I)に関するモデル行列を作成する必要がある
+
+```{r}
+head(Im)
+head(I)
+```
+
+そのほかいろいろと前処理を行う
+
+stanコードでもできるが、Rで行った方が早くて簡便
+
+```{r}
+A <- as.numeric(aewait$A / 100)
+A[A == 0] <- .Machine$double.eps
+A[A == 1] <- 1 - .Machine$double.eps
+S <- as.integer(aewait$S - 2)
+Scomp <- 10 - S;
+T <- aewait$T / 24 * (2 * pi) -pi
+Ttri <- pmax(6 - abs(aewait$T - 12), 0)
+```
+
+```{r eval=FALSE, include=FALSE}
+parameters.model <- stan_model(model_code = stancode)
+fit <- sampling(parameters.model, iter = 3500, seed = 42, thin = 25,
+         data = list(n = nrow(aewait), A = A, I = I, S = S,
+                     Scomp = Scomp, O = aewait$O, T = T,
+                     Ttri = Ttri, W = aewait$W, Im = Im))
+aeparams <- as.data.frame(extract(fit))
+```
+
+前処理後modelをコンパイルしてサンプリングを実行する
+
+20パラメータの同時分布からサンプリングするので実行速度が非常に遅い
